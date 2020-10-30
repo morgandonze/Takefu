@@ -9,16 +9,22 @@ export default function CardComponent(props: {
 }) {
   const { card, editing, onPressEdit } = props;
   const [content, setContent] = useState(card.content);
+  const cardStyle = {
+    padding: 20,
+    backgroundColor: "#f4efef",
+    marginBottom: 20,
+    height: 200,
+  };
 
   if (editing) {
     return (
-      <View
-        style={{ padding: 20, backgroundColor: "#f4efef", marginBottom: 20 }}
-      >
+      <View style={cardStyle}>
         <TextInput
           style={{ borderWidth: 1, borderColor: "#333" }}
+          value={content}
           onChangeText={(text) => {
             setContent(text);
+            card.content = content;
           }}
         />
         <Button
@@ -32,10 +38,7 @@ export default function CardComponent(props: {
     );
   } else {
     return (
-      <TouchableOpacity
-        style={{ padding: 20, backgroundColor: "#f4efef", marginBottom: 20 }}
-        onPress={() => onPressEdit(card.id)}
-      >
+      <TouchableOpacity style={cardStyle} onPress={() => onPressEdit(card.id)}>
         <Text>{card.content}</Text>
       </TouchableOpacity>
     );
