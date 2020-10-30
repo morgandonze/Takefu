@@ -1,6 +1,33 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Card } from "../../App";
+
+function EditingCard(props: {
+  initialContent: string;
+  onSave(text: string): void;
+}) {
+  const { initialContent, onSave } = props;
+  const [content, setContent] = useState(initialContent);
+  return (
+    <View style={styles.card}>
+      <TextInput
+        style={{ borderWidth: 1, borderColor: "#333" }}
+        value={content}
+        onChangeText={(text) => {
+          setContent(text);
+        }}
+      />
+      <Button title="Done" onPress={() => onSave(content)} />
+    </View>
+  );
+}
 
 export default function CardComponent(props: {
   card: Card;
@@ -8,40 +35,36 @@ export default function CardComponent(props: {
   onPressEdit(id: number | null): any;
 }) {
   const { card, editing, onPressEdit } = props;
-  const [content, setContent] = useState(card.content);
-  const cardStyle = {
-    padding: 20,
-    backgroundColor: "#fff",
-    marginBottom: 20,
-    height: 200,
-    width: 350,
-  };
+  // const [content, setContent] = useState(card.content);
 
   if (editing) {
     return (
-      <View style={cardStyle}>
-        <TextInput
-          style={{ borderWidth: 1, borderColor: "#333" }}
-          value={content}
-          onChangeText={(text) => {
-            setContent(text);
-            card.content = content;
-          }}
-        />
-        <Button
-          title="Done"
-          onPress={() => {
-            card.content = content;
-            onPressEdit(null);
-          }}
-        />
-      </View>
+      <EditingCard
+        initialContent={card.content}
+        onSave={(text: string) => {
+          card.content = text;
+          onPressEdit(null);
+        }}
+      />
     );
   } else {
     return (
-      <TouchableOpacity style={cardStyle} onPress={() => onPressEdit(card.id)}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => onPressEdit(card.id)}
+      >
         <Text>{card.content}</Text>
       </TouchableOpacity>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  card: {
+    padding: 20,
+    backgroundColor: "#fff",
+    marginBottom: 20,
+    height: 200,
+    width: 350,
+  },
+});
