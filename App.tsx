@@ -1,6 +1,13 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Button,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { action, makeObservable, observable } from "mobx";
 
 interface Card {
@@ -29,8 +36,12 @@ class CardStore {
 const cardStore = new CardStore();
 cardStore.addCard("Root Card");
 
-function CardComponent(props: { card: Card; editing?: boolean }) {
-  const { card, editing } = props;
+function CardComponent(props: {
+  card: Card;
+  editing?: boolean;
+  onPressEdit(id: number | null): any;
+}) {
+  const { card, editing, onPressEdit } = props;
 
   if (editing) {
     return (
@@ -38,6 +49,7 @@ function CardComponent(props: { card: Card; editing?: boolean }) {
         style={{ padding: 20, backgroundColor: "#f4efef", marginBottom: 20 }}
       >
         <TextInput style={{ borderWidth: 1, borderColor: "#333" }} />
+        <Button title="Done" onPress={() => onPressEdit(null)} />
       </View>
     );
   } else {
@@ -46,17 +58,26 @@ function CardComponent(props: { card: Card; editing?: boolean }) {
         style={{ padding: 20, backgroundColor: "#f4efef", marginBottom: 20 }}
       >
         <Text>{card.content}</Text>
+        <Button title="Edit" onPress={() => onPressEdit(card.id)} />
       </View>
     );
   }
 }
 
 export default function App() {
+  const [editingId, setEditingId] = useState<null | number>(null);
+
   return (
     <View style={styles.container}>
       <FlatList
         data={cardStore.cards.slice()}
-        renderItem={({ item: card }) => <CardComponent card={card} editing />}
+        renderItem={({ item: card }) => (
+          <CardComponent
+            card={card}
+            editing={editingId == card.id}
+            onPressEdit={setEditingId}
+          />
+        )}
       />
 
       <StatusBar style="auto" />
