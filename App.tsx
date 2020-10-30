@@ -6,66 +6,23 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { action, makeObservable, observable } from "mobx";
+import CardComponent from "./src/components/CardComponent";
+import CardStore from "./src/stores/CardStore";
 
-interface Card {
+export interface Card {
   id: number;
   content: string;
-}
-
-class CardStore {
-  cards: Card[] = [];
-  constructor() {
-    makeObservable(this, {
-      cards: observable,
-      getCards: action,
-    });
-  }
-
-  getCards() {
-    return this.cards;
-  }
-
-  addCard(content: string) {
-    this.cards.push({ content, id: this.cards.slice().length });
-  }
 }
 
 const cardStore = new CardStore();
 cardStore.addCard("Root Card");
 
-function CardComponent(props: {
-  card: Card;
-  editing?: boolean;
-  onPressEdit(id: number | null): any;
-}) {
-  const { card, editing, onPressEdit } = props;
-
-  if (editing) {
-    return (
-      <View
-        style={{ padding: 20, backgroundColor: "#f4efef", marginBottom: 20 }}
-      >
-        <TextInput style={{ borderWidth: 1, borderColor: "#333" }} />
-        <Button title="Done" onPress={() => onPressEdit(null)} />
-      </View>
-    );
-  } else {
-    return (
-      <View
-        style={{ padding: 20, backgroundColor: "#f4efef", marginBottom: 20 }}
-      >
-        <Text>{card.content}</Text>
-        <Button title="Edit" onPress={() => onPressEdit(card.id)} />
-      </View>
-    );
-  }
-}
-
 export default function App() {
-  const [editingId, setEditingId] = useState<null | number>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   return (
     <View style={styles.container}>
