@@ -11,9 +11,10 @@ export default function CardComponent(props: {
   const [content, setContent] = useState(card.content);
   const cardStyle = {
     padding: 20,
-    backgroundColor: "#f4efef",
+    backgroundColor: "#fff",
     marginBottom: 20,
     height: 200,
+    width: 350,
   };
 
   if (editing) {
