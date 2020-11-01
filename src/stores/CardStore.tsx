@@ -1,5 +1,5 @@
 import { makeObservable, observable, action } from "mobx";
-import { Card } from "../../App";
+import { Card } from "../models/Card";
 
 export default class CardStore {
   cards: Card[] = [];

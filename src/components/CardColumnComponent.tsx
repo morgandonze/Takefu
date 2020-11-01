@@ -1,6 +1,6 @@
 import React from "react";
 import { View, FlatList, StyleSheet } from "react-native";
-import { Card } from "../../App";
+import { Card } from "../models/Card";
 import CardComponent from "./CardComponent";
 
 export default function CardColumnComponent(props: {

@@ -4,11 +4,6 @@ import { StyleSheet, View } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
 import CardStore from "./src/stores/CardStore";
 
-export interface Card {
-  id: number;
-  content: string;
-}
-
 const cardStore = new CardStore();
 cardStore.addCard("Root Card");
 

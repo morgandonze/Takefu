@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Card } from "../../App";
+import { Card } from "../models/Card";
 
 function EditingCard(props: {
   initialContent: string;
@@ -35,7 +35,6 @@ export default function CardComponent(props: {
   onPressEdit(id: number | null): any;
 }) {
   const { card, editing, onPressEdit } = props;
-  // const [content, setContent] = useState(card.content);
 
   if (editing) {
     return (
