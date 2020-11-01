@@ -1,14 +1,28 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import { observer } from "mobx-react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
+import { Card } from "./src/models/Card";
 import CardStore from "./src/stores/CardStore";
 
 const cardStore = new CardStore();
-cardStore.addCard("Root Card");
 
 export default function App() {
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [cards, setCards] = useState<Card[]>([]);
+
+  useLayoutEffect(() => {
+    const setupCardStore = async function () {
+      // await cardStore.saveCards();
+      await cardStore.loadCards();
+      setCards(cardStore.cards);
+    };
+
+    setupCardStore();
+  }, []);
+
+  console.log(cardStore.cards.slice());
 
   return (
     <View style={styles.container}>
