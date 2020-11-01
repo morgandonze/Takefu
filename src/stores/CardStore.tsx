@@ -32,6 +32,11 @@ export default class CardStore {
   }
 
   addCard(content: string) {
-    this.cards.push({ content, id: this.cards.slice().length });
+    this.cards.push({
+      content,
+      id: this.cards.slice().length,
+      level: 0,
+      index: 0,
+    });
   }
 }
