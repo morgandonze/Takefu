@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import { observer, Provider } from "mobx-react";
 import React, { useLayoutEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
@@ -7,12 +8,20 @@ import CardStore from "./src/stores/CardStore";
 
 const cardStore = new CardStore();
 
-export default function App() {
+// cardStore.addCard({
+//   id: 0,
+//   content: "root card",
+//   index: 0,
+//   level: 0,
+// });
+
+function App() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [, setCards] = useState<Card[]>([]);
 
   useLayoutEffect(() => {
     const setupCardStore = async function () {
+      // await cardStore.saveCards()
       await cardStore.loadCards();
       setCards(cardStore.cards);
     };
@@ -21,14 +30,16 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <CardColumnComponent
-        cards={cardStore.cards.slice()}
-        editingId={editingId}
-        setEditingId={setEditingId}
-      />
-      <StatusBar style="auto" />
-    </View>
+    <Provider cardStore={cardStore}>
+      <View style={styles.container}>
+        <CardColumnComponent
+          cards={cardStore.cards.slice()}
+          editingId={editingId}
+          setEditingId={setEditingId}
+        />
+        <StatusBar style="auto" />
+      </View>
+    </Provider>
   );
 }
 
@@ -42,3 +53,5 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
 });
+
+export default observer(App);

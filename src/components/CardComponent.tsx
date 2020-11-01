@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import React, { useState } from "react";
 import {
   Button,
@@ -8,6 +9,11 @@ import {
   View,
 } from "react-native";
 import { Card } from "../models/Card";
+
+import { MobXProviderContext } from "mobx-react";
+function useStores() {
+  return React.useContext(MobXProviderContext);
+}
 
 function EditingCard(props: {
   initialContent: string;
@@ -29,11 +35,13 @@ function EditingCard(props: {
   );
 }
 
-export default function CardComponent(props: {
+export default observer(function CardComponent(props: {
   card: Card;
   editing?: boolean;
   onPressEdit(id: number | null): any;
 }) {
+  const { cardStore } = useStores();
+
   const { card, editing, onPressEdit } = props;
 
   if (editing) {
@@ -53,10 +61,24 @@ export default function CardComponent(props: {
         onPress={() => onPressEdit(card.id)}
       >
         <Text>{card.content}</Text>
+
+        <Button title="add child" onPress={() => {}} />
+        <Button title="add sibling" onPress={async () => {
+          const newCard: Card = {
+            content: "",
+            id: 0,
+            index: card.index + 1,
+            level: 0
+          }
+          await cardStore.addCard(newCard)
+          await cardStore.saveCards()
+        }} />
+
+
       </TouchableOpacity>
     );
   }
-}
+});
 
 const styles = StyleSheet.create({
   card: {

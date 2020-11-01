@@ -1,9 +1,10 @@
+import { observer } from "mobx-react";
 import React from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { Card } from "../models/Card";
 import CardComponent from "./CardComponent";
 
-export default function CardColumnComponent(props: {
+export default observer(function CardColumnComponent(props: {
   cards: Card[];
   editingId: number | null;
   setEditingId(id: number | null): any;
@@ -24,7 +25,7 @@ export default function CardColumnComponent(props: {
       />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   cardColumn: {

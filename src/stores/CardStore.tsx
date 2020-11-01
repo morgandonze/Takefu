@@ -31,12 +31,10 @@ export default class CardStore {
     return this.cards;
   }
 
-  addCard(content: string) {
+  addCard(card: Card) {
     this.cards.push({
-      content,
-      id: this.cards.slice().length,
-      level: 0,
-      index: 0,
+      ...card,
+      id: this.cards.length,
     });
   }
 }
