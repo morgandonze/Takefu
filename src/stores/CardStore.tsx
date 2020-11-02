@@ -12,7 +12,9 @@ export default class CardStore {
       cards: observable,
       editingId: observable,
       focusedId: observable,
-      getCards: action,
+      loadCards: action,
+      addCard: action,
+      updateCard: action,
     });
   }
 
