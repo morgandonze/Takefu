@@ -1,6 +1,13 @@
 import { observer } from "mobx-react";
-import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Card } from "../models/Card";
 
 import { MobXProviderContext } from "mobx-react";
@@ -50,8 +57,16 @@ export default observer(function CardComponent(props: { card: Card }) {
   const { card } = props;
   const [editing, setEditing] = useState(cardStore.editingId == card.id);
 
+  useEffect(() => {
+    setEditing(cardStore.editingId == card.id);
+  }, [cardStore.editingId]);
+
+  const onFocus = (e: any) => {
+
+  }
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onFocus}>
       <CardText
         editing={editing}
         card={card}
@@ -74,10 +89,10 @@ export default observer(function CardComponent(props: { card: Card }) {
             index: 0,
             level: card.level + 1,
           });
-          await cardStore.saveCards()
+          await cardStore.saveCards();
         }}
       />
-    </View>
+    </TouchableOpacity>
   );
 });
 
@@ -85,7 +100,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 20,
     backgroundColor: "#fff",
-    marginBottom: 20,
+    marginBottom: 2,
     width: 350,
   },
 });

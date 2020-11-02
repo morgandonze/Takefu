@@ -9,6 +9,7 @@ export default class CardStore {
   constructor() {
     makeObservable(this, {
       cards: observable,
+      editingId: observable,
       getCards: action,
     });
   }
