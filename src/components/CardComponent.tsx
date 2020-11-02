@@ -96,11 +96,7 @@ export default observer(function CardComponent(props: { card: Card }) {
       <Button
         title="Add Child"
         onPress={async () => {
-          cardStore.addCard({
-            content: `${card.content} child`,
-            index: 0,
-            level: card.level + 1,
-          });
+          cardStore.addCard(`${card.content} child`, card);
           await cardStore.saveCards();
         }}
       />

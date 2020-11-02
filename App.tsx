@@ -7,16 +7,11 @@ import { Card } from "./src/models/Card";
 import CardStore from "./src/stores/CardStore";
 
 const cardStore = new CardStore();
-const reset = false;
-// const reset = true;
+let reset: boolean;
+reset = false; // switch to true and back to reset
 
 if (reset) {
-  cardStore.addCard({
-    id: 0,
-    content: "root card",
-    index: 0,
-    level: 0,
-  });
+  cardStore.addCard("Root Card");
 }
 
 function App() {
