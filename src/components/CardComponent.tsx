@@ -56,17 +56,29 @@ export default observer(function CardComponent(props: { card: Card }) {
   const { cardStore } = useStores();
   const { card } = props;
   const [editing, setEditing] = useState(cardStore.editingId == card.id);
+  const [focused, setFocused] = useState(cardStore.focused == card.id);
 
   useEffect(() => {
     setEditing(cardStore.editingId == card.id);
   }, [cardStore.editingId]);
 
-  const onFocus = (e: any) => {
+  useEffect(() => {
+    setFocused(cardStore.focusedId == card.id);
+  }, [cardStore.focusedId]);
 
-  }
+  const onFocus = (e: any) => {
+    cardStore.focusedId = card.id;
+  };
+
+  const combineStyles = StyleSheet.flatten([
+    styles.card,
+    {
+      backgroundColor: focused ? "#fcfcfc" : "#cccccc",
+    },
+  ]);
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onFocus}>
+    <TouchableOpacity style={combineStyles} onPress={onFocus}>
       <CardText
         editing={editing}
         card={card}

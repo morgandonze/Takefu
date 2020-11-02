@@ -3,5 +3,4 @@ export interface Card {
   content: string;
   level: number;
   index: number;
-
 }

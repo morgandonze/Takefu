@@ -5,11 +5,13 @@ import { Card } from "../models/Card";
 export default class CardStore {
   cards: Card[] = [];
   editingId: number | null = null;
+  focusedId: number | null = 0;
 
   constructor() {
     makeObservable(this, {
       cards: observable,
       editingId: observable,
+      focusedId: observable,
       getCards: action,
     });
   }
