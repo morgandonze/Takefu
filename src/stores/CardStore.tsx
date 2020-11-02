@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-community/async-storage";
 import { makeObservable, observable, action } from "mobx";
 import { Card } from "../models/Card";
+import { v4 as uuid } from "uuid";
 
 export default class CardStore {
   cards: Card[] = [];
@@ -38,14 +39,19 @@ export default class CardStore {
     return this.cards;
   }
 
-  addCard(card: Card) {
-    this.cards.push({
-      ...card,
-      id: this.cards.length,
-    });
+  addCard(content: string, parent: Card | null = null, index: number = 0) {
+    const card: Card = {
+      content,
+      id: uuid(),
+      level: parent ? parent.level + 1 : 0,
+      index,
+      parent,
+      children: [],
+    };
+    this.cards.push(card);
   }
 
-  updateCard(cardId: number, card: Card) {
+  updateCard(cardId: string, card: Card) {
     const index = this.cards.findIndex((card: Card, index: number) => {
       return card.id == cardId;
     });
