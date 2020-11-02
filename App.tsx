@@ -16,7 +16,6 @@ const cardStore = new CardStore();
 // });
 
 function App() {
-  const [editingId, setEditingId] = useState<number | null>(null);
   const [, setCards] = useState<Card[]>([]);
 
   useEffect(() => {

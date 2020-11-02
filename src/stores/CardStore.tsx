@@ -4,6 +4,8 @@ import { Card } from "../models/Card";
 
 export default class CardStore {
   cards: Card[] = [];
+  editingId: number | null = null;
+
   constructor() {
     makeObservable(this, {
       cards: observable,
@@ -36,5 +38,13 @@ export default class CardStore {
       ...card,
       id: this.cards.length,
     });
+  }
+
+  updateCard(cardId: number, card: Card) {
+    const index = this.cards.findIndex((card: Card, index: number) => {
+      return card.id == cardId;
+    });
+    const origCard = this.cards[index];
+    this.cards[index] = card;
   }
 }
