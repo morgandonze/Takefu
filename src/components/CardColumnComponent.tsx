@@ -7,13 +7,12 @@ import CardComponent from "./CardComponent";
 export default observer(function CardColumnComponent(props: { cards: Card[] }) {
   const { cards } = props;
   return (
-    <ScrollView contentContainerStyle={styles.cardColumn}>
-      <FlatList
-        data={cards}
-        contentContainerStyle={styles.columnListContainer}
-        renderItem={({ item: card }) => <CardComponent card={card} />}
-      />
-    </ScrollView>
+    <FlatList
+      data={cards}
+      contentContainerStyle={styles.columnListContainer}
+      keyExtractor={(_item, index) => `${index}`}
+      renderItem={({ item: card }) => <CardComponent card={card} />}
+    />
   );
 });
 
@@ -25,5 +24,5 @@ const styles = StyleSheet.create({
     height: "100%",
     // justifyContent: "center"
   },
-  columnListContainer: {flexGrow: 1},
+  columnListContainer: { flexGrow: 1 },
 });

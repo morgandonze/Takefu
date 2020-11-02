@@ -1,13 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import { observer, Provider } from "mobx-react";
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
 import { Card } from "./src/models/Card";
 import CardStore from "./src/stores/CardStore";
 
 const cardStore = new CardStore();
 const reset = false;
+// const reset = true;
 
 if (reset) {
   cardStore.addCard({
@@ -38,9 +39,9 @@ function App() {
   return (
     <Provider cardStore={cardStore}>
       <FlatList
-        // data={columns}
         data={Object.values(columns)}
         contentContainerStyle={styles.container}
+        keyExtractor={(item, index) => `${index}`}
         renderItem={({ item: column }) => (
           <CardColumnComponent cards={column} />
         )}
