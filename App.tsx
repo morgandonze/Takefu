@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { observer, Provider } from "mobx-react";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
 import { Card } from "./src/models/Card";
@@ -19,7 +19,7 @@ function App() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [, setCards] = useState<Card[]>([]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const setupCardStore = async function () {
       // await cardStore.saveCards()
       await cardStore.loadCards();
