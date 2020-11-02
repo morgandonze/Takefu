@@ -56,18 +56,18 @@ export default observer(function CardComponent(props: { card: Card }) {
   const { cardStore } = useStores();
   const { card } = props;
   const [editing, setEditing] = useState(cardStore.editingId == card.id);
-  const [focused, setFocused] = useState(cardStore.focused == card.id);
+  const [focused, setFocused] = useState(cardStore.focused == card);
 
   useEffect(() => {
     setEditing(cardStore.editingId == card.id);
   }, [cardStore.editingId]);
 
   useEffect(() => {
-    setFocused(cardStore.focusedId == card.id);
-  }, [cardStore.focusedId]);
+    setFocused(cardStore.focused == card);
+  }, [cardStore.focused]);
 
   const onFocus = (e: any) => {
-    cardStore.focusedId = card.id;
+    cardStore.focused = card;
   };
 
   const combineStyles = StyleSheet.flatten([

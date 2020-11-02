@@ -1,21 +1,22 @@
 import AsyncStorage from "@react-native-community/async-storage";
-import { makeObservable, observable, action } from "mobx";
+import { makeObservable, observable, action, computed } from "mobx";
 import { Card } from "../models/Card";
 import { v4 as uuid } from "uuid";
 
 export default class CardStore {
   cards: Card[] = [];
   editingId: number | null = null;
-  focusedId: number | null = 0;
+  focused: Card | null = null;
 
   constructor() {
     makeObservable(this, {
       cards: observable,
       editingId: observable,
-      focusedId: observable,
+      focused: observable,
       loadCards: action,
       addCard: action,
       updateCard: action,
+      columns: computed,
     });
   }
 
@@ -59,7 +60,7 @@ export default class CardStore {
     this.cards[index] = card;
   }
 
-  getColumns(): Card[][] {
+  get columns(): Card[][] {
     const reducer = (obj: any, card: Card) => {
       if (!obj.hasOwnProperty(card.level)) {
         obj[card.level] = [];
