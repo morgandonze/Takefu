@@ -35,22 +35,19 @@ function EditingCard(props: {
   );
 }
 
-export default observer(function CardComponent(props: {
-  card: Card;
-  editing?: boolean;
-  onPressEdit(id: number | null): any;
-}) {
+export default observer(function CardComponent(props: { card: Card }) {
   const { cardStore } = useStores();
-
-  const { card, editing, onPressEdit } = props;
+  const { card } = props;
+  const [editing, setEditing] = useState(false);
 
   if (editing) {
     return (
       <EditingCard
         initialContent={card.content}
-        onSave={(text: string) => {
+        onSave={async (text: string) => {
           card.content = text;
-          onPressEdit(null);
+          await cardStore.saveCards();
+          setEditing(false);
         }}
       />
     );
@@ -58,23 +55,26 @@ export default observer(function CardComponent(props: {
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() => onPressEdit(card.id)}
+        onPress={() => {
+          setEditing(true);
+        }}
       >
         <Text>{card.content}</Text>
 
         <Button title="add child" onPress={() => {}} />
-        <Button title="add sibling" onPress={async () => {
-          const newCard: Card = {
-            content: "",
-            id: 0,
-            index: card.index + 1,
-            level: 0
-          }
-          await cardStore.addCard(newCard)
-          await cardStore.saveCards()
-        }} />
-
-
+        <Button
+          title="add sibling"
+          onPress={async () => {
+            const newCard: Card = {
+              content: "",
+              id: 0,
+              index: card.index + 1,
+              level: 0,
+            };
+            await cardStore.addCard(newCard);
+            await cardStore.saveCards();
+          }}
+        />
       </TouchableOpacity>
     );
   }

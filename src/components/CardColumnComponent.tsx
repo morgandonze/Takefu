@@ -4,24 +4,14 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { Card } from "../models/Card";
 import CardComponent from "./CardComponent";
 
-export default observer(function CardColumnComponent(props: {
-  cards: Card[];
-  editingId: number | null;
-  setEditingId(id: number | null): any;
-}) {
-  const { cards, editingId, setEditingId } = props;
+export default observer(function CardColumnComponent(props: { cards: Card[] }) {
+  const { cards } = props;
   return (
     <View style={styles.cardColumn}>
       <FlatList
         data={cards}
         contentContainerStyle={styles.columnListContainer}
-        renderItem={({ item: card }) => (
-          <CardComponent
-            card={card}
-            editing={editingId == card.id}
-            onPressEdit={setEditingId}
-          />
-        )}
+        renderItem={({ item: card }) => <CardComponent card={card} />}
       />
     </View>
   );
