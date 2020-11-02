@@ -74,4 +74,14 @@ export default class CardStore {
     const columnsObj = this.cards.reduce(reducer, {});
     return Object.values(columnsObj);
   }
+
+  descendsFromFocused(card: Card): boolean {
+    if (!this.focused || !card.parent) {
+      return false;
+    } else if (this.focused.id == card.parent.id) {
+      return true;
+    } else {
+      return this.descendsFromFocused(card.parent);
+    }
+  }
 }

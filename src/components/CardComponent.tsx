@@ -70,10 +70,18 @@ export default observer(function CardComponent(props: { card: Card }) {
     cardStore.focused = card;
   };
 
+  let cardBackground: string;
+  if (focused) {
+    cardBackground = "#fcfcfc";
+  } else if (cardStore.descendsFromFocused(card)) {
+    cardBackground = "#e0e0e0";
+  } else {
+    cardBackground = "#aaaaab";
+  }
   const combineStyles = StyleSheet.flatten([
     styles.card,
     {
-      backgroundColor: focused ? "#fcfcfc" : "#cccccc",
+      backgroundColor: cardBackground,
     },
   ]);
 
