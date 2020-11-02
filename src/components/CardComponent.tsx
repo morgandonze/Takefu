@@ -19,22 +19,26 @@ const CardText = function (props: {
 
   if (!editing) {
     return (
-      <View>
-        <Text>{content}</Text>
+      <View style={{ marginBottom: 10 }}>
+        <View style={{ marginBottom: 50 }}>
+          <Text>{content}</Text>
+        </View>
         <Button title="edit" onPress={onEdit} />
       </View>
     );
   } else {
     return (
-      <View>
-        <TextInput
-          style={{ borderWidth: 1, borderColor: "#333" }}
-          value={content}
-          onChangeText={(text) => {
-            console.log("change text");
-            setContent(text);
-          }}
-        />
+      <View style={{ marginBottom: 10 }}>
+        <View>
+          <TextInput
+            style={{ borderWidth: 1, borderColor: "#333", paddingBottom: 50 }}
+            value={content}
+            onChangeText={(text) => {
+              console.log("change text");
+              setContent(text);
+            }}
+          />
+        </View>
         <Button title="done" onPress={() => onSave(content)} />
       </View>
     );
@@ -62,6 +66,17 @@ export default observer(function CardComponent(props: { card: Card }) {
           setEditing(false);
         }}
       />
+      <Button
+        title="Add Child"
+        onPress={async () => {
+          cardStore.addCard({
+            content: `${card.content} child`,
+            index: 0,
+            level: card.level + 1,
+          });
+          await cardStore.saveCards()
+        }}
+      />
     </View>
   );
 });
@@ -71,7 +86,6 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
     marginBottom: 20,
-    height: 200,
     width: 350,
   },
 });
