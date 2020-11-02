@@ -47,4 +47,19 @@ export default class CardStore {
     const origCard = this.cards[index];
     this.cards[index] = card;
   }
+
+  getColumns(): Card[][] {
+    const reducer = (obj: any, card: Card) => {
+      if (!obj.hasOwnProperty(card.level)) {
+        obj[card.level] = [];
+      }
+
+      obj[card.level].push(card);
+
+      return obj;
+    };
+
+    const columnsObj = this.cards.reduce(reducer, {});
+    return Object.values(columnsObj);
+  }
 }
