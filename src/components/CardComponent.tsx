@@ -1,6 +1,13 @@
 import { observer } from "mobx-react";
-import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Card } from "../models/Card";
 
 import { MobXProviderContext } from "mobx-react";
@@ -49,9 +56,29 @@ export default observer(function CardComponent(props: { card: Card }) {
   const { cardStore } = useStores();
   const { card } = props;
   const [editing, setEditing] = useState(cardStore.editingId == card.id);
+  const [focused, setFocused] = useState(cardStore.focused == card.id);
+
+  useEffect(() => {
+    setEditing(cardStore.editingId == card.id);
+  }, [cardStore.editingId]);
+
+  useEffect(() => {
+    setFocused(cardStore.focusedId == card.id);
+  }, [cardStore.focusedId]);
+
+  const onFocus = (e: any) => {
+    cardStore.focusedId = card.id;
+  };
+
+  const combineStyles = StyleSheet.flatten([
+    styles.card,
+    {
+      backgroundColor: focused ? "#fcfcfc" : "#cccccc",
+    },
+  ]);
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={combineStyles} onPress={onFocus}>
       <CardText
         editing={editing}
         card={card}
@@ -69,15 +96,11 @@ export default observer(function CardComponent(props: { card: Card }) {
       <Button
         title="Add Child"
         onPress={async () => {
-          cardStore.addCard({
-            content: `${card.content} child`,
-            index: 0,
-            level: card.level + 1,
-          });
-          await cardStore.saveCards()
+          cardStore.addCard(`${card.content} child`, card);
+          await cardStore.saveCards();
         }}
       />
-    </View>
+    </TouchableOpacity>
   );
 });
 
@@ -85,7 +108,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 20,
     backgroundColor: "#fff",
-    marginBottom: 20,
+    marginBottom: 2,
     width: 350,
   },
 });

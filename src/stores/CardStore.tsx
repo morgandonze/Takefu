@@ -1,15 +1,18 @@
 import AsyncStorage from "@react-native-community/async-storage";
 import { makeObservable, observable, action } from "mobx";
 import { Card } from "../models/Card";
+import { v4 as uuid } from "uuid";
 
 export default class CardStore {
   cards: Card[] = [];
   editingId: number | null = null;
+  focusedId: number | null = 0;
 
   constructor() {
     makeObservable(this, {
       cards: observable,
-      getCards: action,
+      editingId: observable,
+      focusedId: observable,
     });
   }
 
@@ -29,22 +32,38 @@ export default class CardStore {
     } catch (e) {}
   }
 
-  getCards() {
-    return this.cards;
+  addCard(content: string, parent: Card | null = null, index: number = 0) {
+    const card: Card = {
+      content,
+      id: uuid(),
+      level: parent ? parent.level + 1 : 0,
+      index,
+      parent,
+      children: [],
+    };
+    this.cards.push(card);
   }
 
-  addCard(card: Card) {
-    this.cards.push({
-      ...card,
-      id: this.cards.length,
-    });
-  }
-
-  updateCard(cardId: number, card: Card) {
+  updateCard(cardId: string, card: Card) {
     const index = this.cards.findIndex((card: Card, index: number) => {
       return card.id == cardId;
     });
     const origCard = this.cards[index];
     this.cards[index] = card;
+  }
+
+  getColumns(): Card[][] {
+    const reducer = (obj: any, card: Card) => {
+      if (!obj.hasOwnProperty(card.level)) {
+        obj[card.level] = [];
+      }
+
+      obj[card.level].push(card);
+
+      return obj;
+    };
+
+    const columnsObj = this.cards.reduce(reducer, {});
+    return Object.values(columnsObj);
   }
 }

@@ -1,7 +1,8 @@
 export interface Card {
-  id: number;
+  id: string;
   content: string;
   level: number;
   index: number;
-
+  parent: Card | null;
+  children: Card[];
 }
