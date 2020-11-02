@@ -34,8 +34,6 @@ function App() {
       <View style={styles.container}>
         <CardColumnComponent
           cards={cardStore.cards.slice()}
-          editingId={editingId}
-          setEditingId={setEditingId}
         />
         <StatusBar style="auto" />
       </View>
