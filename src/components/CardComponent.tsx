@@ -73,7 +73,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   let cardBackground: string;
   if (focused) {
     cardBackground = "#fcfcfc";
-  } else if (cardStore.descendsFromFocused(card)) {
+  } else if (cardStore.relatedToFocused(card)) {
     cardBackground = "#e0e0e0";
   } else {
     cardBackground = "#aaaaab";

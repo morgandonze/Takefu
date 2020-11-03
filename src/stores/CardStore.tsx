@@ -56,28 +56,73 @@ export default class CardStore {
     this.cards[index] = card;
   }
 
-  get columns(): Card[][] {
+  // Builds an index of cards by tree level
+  get columnsObj(): any {
     const reducer = (obj: any, card: Card) => {
       if (!obj.hasOwnProperty(card.level)) {
         obj[card.level] = [];
       }
-
       obj[card.level].push(card);
-
       return obj;
     };
 
     const columnsObj = this.cards.reduce(reducer, {});
-    return Object.values(columnsObj);
+    return columnsObj;
   }
 
-  descendsFromFocused(card: Card): boolean {
-    if (!this.focused || !card.parent) {
+  // Returns card columns as an array of arrays
+  get columns(): Card[][] {
+    const columnsObj: any = this.columnsObj;
+    console.log(Object.values(columnsObj));
+    return this.sortColumns(Object.values(columnsObj));
+  }
+
+  orderCards(cardA: Card, cardB: Card): number {
+    if (!cardA.parent && !cardB.parent) {
+      return cardA.index < cardB.index ? -1 : cardA.index > cardB.index ? 1 : 0;
+    } else if (!cardA.parent && cardB.parent) {
+      return -1;
+    } else if (cardA.parent && !cardB.parent) {
+      return 1;
+    }
+
+    if (!cardA.parent || !cardB.parent) {
+      return 0;
+    }
+
+    if (cardA.parent.index < cardB.parent.index) {
+      return -1;
+    } else if (cardA.parent.index == cardB.parent.index) {
+      return cardA.index < cardB.index ? -1 : cardA.index > cardB.index ? 1 : 0;
+    } else if (cardA.parent.index > cardB.parent.index) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  sortColumns(columns: Card[][]): Card[][] {
+    console.log("sorting");
+    for (var col = 0; col < columns.length; col++) {
+      columns[col] = columns[col].sort(this.orderCards);
+    }
+    return columns;
+  }
+
+  relatedToFocused(card: Card): boolean {
+    return (
+      this.descendsFrom(card, this.focused) ||
+      this.descendsFrom(this.focused, card)
+    );
+  }
+
+  descendsFrom(cardA: Card | null, cardB: Card | null): boolean {
+    if (!cardA || !cardB || !cardA.parent) {
       return false;
-    } else if (this.focused.id == card.parent.id) {
+    } else if (cardB.id == cardA.parent.id) {
       return true;
     } else {
-      return this.descendsFromFocused(card.parent);
+      return this.descendsFrom(cardA.parent, cardB);
     }
   }
 }
