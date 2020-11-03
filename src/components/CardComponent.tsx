@@ -68,7 +68,6 @@ export default observer(function CardComponent(props: { card: Card }) {
   const onFocus = (e: any) => {
     cardStore.focused = card;
     const lineage = cardStore.getLineage(card);
-    console.log(lineage);
   };
 
   let cardBackground: string;
