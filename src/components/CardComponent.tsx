@@ -41,7 +41,6 @@ const CardText = function (props: {
             style={{ borderWidth: 1, borderColor: "#333", paddingBottom: 50 }}
             value={content}
             onChangeText={(text) => {
-              console.log("change text");
               setContent(text);
             }}
           />
@@ -104,7 +103,8 @@ export default observer(function CardComponent(props: { card: Card }) {
       <Button
         title="Add Child"
         onPress={async () => {
-          cardStore.addCard(`${card.content} child`, card);
+          const newCard = cardStore.addCard(`${card.content} child`, card);
+          card.children.push(newCard)
           await cardStore.saveCards();
         }}
       />

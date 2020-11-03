@@ -33,19 +33,22 @@ export default class CardStore {
     try {
       const cards = JSON.stringify(this.cards);
       await AsyncStorage.setItem("cards", cards);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  addCard(content: string, parent: Card | null = null, index: number = 0) {
+  addCard(content: string, parent: Card | null = null): Card {
     const card: Card = {
       content,
       id: uuid(),
       level: parent ? parent.level + 1 : 0,
-      index,
-      parent,
+      index: parent ? parent.children.length : 0, // replace 0 with number of level 0 cards
+      parentId: parent ? parent.id : null,
       children: [],
     };
     this.cards.push(card);
+    return card;
   }
 
   updateCard(cardId: string, card: Card) {
@@ -73,38 +76,40 @@ export default class CardStore {
   // Returns card columns as an array of arrays
   get columns(): Card[][] {
     const columnsObj: any = this.columnsObj;
-    console.log(Object.values(columnsObj));
     return this.sortColumns(Object.values(columnsObj));
   }
 
-  orderCards(cardA: Card, cardB: Card): number {
-    if (!cardA.parent && !cardB.parent) {
-      return cardA.index < cardB.index ? -1 : cardA.index > cardB.index ? 1 : 0;
-    } else if (!cardA.parent && cardB.parent) {
-      return -1;
-    } else if (cardA.parent && !cardB.parent) {
-      return 1;
-    }
+  getCard(cardId: string): Card | null {
+    const card = this.cards.find((card: Card) => {
+      return card.id == cardId;
+    });
+    return card || null;
+  }
 
-    if (!cardA.parent || !cardB.parent) {
-      return 0;
-    }
-
-    if (cardA.parent.index < cardB.parent.index) {
-      return -1;
-    } else if (cardA.parent.index == cardB.parent.index) {
-      return cardA.index < cardB.index ? -1 : cardA.index > cardB.index ? 1 : 0;
-    } else if (cardA.parent.index > cardB.parent.index) {
-      return 1;
+  getLineage(card: Card, lineage = []): number[] {
+    const parent = this.getCard(card.parentId as string);
+    if (parent) {
+      return [...this.getLineage(parent), card.index, ...lineage];
     } else {
-      return 0;
+      return [card.index, ...lineage];
     }
   }
 
+  orderCards(_this: any) {
+    return (cardA: Card, cardB: Card): number => {
+      const lineageA = _this.getLineage(cardA);
+      console.log(cardA.index);
+      console.log(lineageA);
+      const lineageB = _this.getLineage(cardB);
+      return 0;
+    };
+  }
+
+  // deprecated
+
   sortColumns(columns: Card[][]): Card[][] {
-    console.log("sorting");
     for (var col = 0; col < columns.length; col++) {
-      columns[col] = columns[col].sort(this.orderCards);
+      columns[col] = columns[col].sort(this.orderCards(this));
     }
     return columns;
   }
@@ -116,13 +121,14 @@ export default class CardStore {
     );
   }
 
-  descendsFrom(cardA: Card | null, cardB: Card | null): boolean {
-    if (!cardA || !cardB || !cardA.parent) {
+  descendsFrom(cardA: Card, cardB: Card | null): boolean {
+    const cardAParent = this.getCard(cardA?.parentId as string);
+    if (!cardA || !cardB || !cardAParent) {
       return false;
-    } else if (cardB.id == cardA.parent.id) {
+    } else if (cardB.id == cardAParent.id) {
       return true;
     } else {
-      return this.descendsFrom(cardA.parent, cardB);
+      return this.descendsFrom(cardAParent, cardB);
     }
   }
 }
