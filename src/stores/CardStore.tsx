@@ -86,10 +86,10 @@ export default class CardStore {
     return card || null;
   }
 
-  getLineage(card: Card, lineage = []): number[] {
+  getLineage(card: Card, lineage: number[] = []): number[] {
     const parent = this.getCard(card.parentId as string);
     if (parent) {
-      return [...this.getLineage(parent), card.index, ...lineage];
+      return this.getLineage(parent, [card.index, ...lineage]);
     } else {
       return [card.index, ...lineage];
     }
@@ -97,15 +97,23 @@ export default class CardStore {
 
   orderCards(_this: any) {
     return (cardA: Card, cardB: Card): number => {
-      const lineageA = _this.getLineage(cardA);
-      console.log(cardA.index);
-      console.log(lineageA);
-      const lineageB = _this.getLineage(cardB);
-      return 0;
+      const lineageA: number[] = _this.getLineage(cardA);
+      const lineageB: number[] = _this.getLineage(cardB);
+
+      if (lineageA.length != lineageB.length) { return 0}
+      
+      for (var i=0; i<lineageA.length; i++) {
+        if (lineageA[i] < lineageB[i]) {
+          return -1
+        } else if (lineageA[i] > lineageB[i]) {
+          return 1
+        }
+      }
+
+      return 0
     };
   }
 
-  // deprecated
 
   sortColumns(columns: Card[][]): Card[][] {
     for (var col = 0; col < columns.length; col++) {

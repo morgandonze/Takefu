@@ -3,6 +3,7 @@ import { observer, Provider } from "mobx-react";
 import React, { useEffect } from "react";
 import { FlatList, StyleSheet } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
+import { Card } from "./src/models/Card";
 import CardStore from "./src/stores/CardStore";
 
 const cardStore = new CardStore();
@@ -10,7 +11,7 @@ let reset: boolean;
 reset = false; // switch to true and back to reset
 
 if (reset) {
-  cardStore.addCard("Root Card");
+  cardStore.addCard("0");
 }
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
       <FlatList
         data={Object.values(cardStore.columns)}
         contentContainerStyle={styles.container}
-        keyExtractor={(item, index) => `${index}`}
+        keyExtractor={(item: Card[], index) => `${index}-column`}
         renderItem={({ item: column }) => (
           <CardColumnComponent cards={column} />
         )}

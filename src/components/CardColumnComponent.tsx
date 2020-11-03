@@ -10,7 +10,7 @@ export default observer(function CardColumnComponent(props: { cards: Card[] }) {
     <FlatList
       data={cards}
       contentContainerStyle={styles.columnListContainer}
-      keyExtractor={(_item, index) => `${index}`}
+      keyExtractor={(_item, index) => `${_item.id}-card`}
       renderItem={({ item: card }) => <CardComponent card={card} />}
     />
   );

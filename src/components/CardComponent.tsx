@@ -67,6 +67,8 @@ export default observer(function CardComponent(props: { card: Card }) {
 
   const onFocus = (e: any) => {
     cardStore.focused = card;
+    const lineage = cardStore.getLineage(card);
+    console.log(lineage);
   };
 
   let cardBackground: string;
@@ -83,6 +85,8 @@ export default observer(function CardComponent(props: { card: Card }) {
       backgroundColor: cardBackground,
     },
   ]);
+
+  const lineage = cardStore.getLineage(card);
 
   return (
     <TouchableOpacity style={combineStyles} onPress={onFocus}>
@@ -103,8 +107,11 @@ export default observer(function CardComponent(props: { card: Card }) {
       <Button
         title="Add Child"
         onPress={async () => {
-          const newCard = cardStore.addCard(`${card.content} child`, card);
-          card.children.push(newCard)
+          const newCard = cardStore.addCard(
+            `${lineage},${card.children.length}`,
+            card
+          );
+          card.children.push(newCard);
           await cardStore.saveCards();
         }}
       />
