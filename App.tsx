@@ -1,7 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import { observer, Provider } from "mobx-react";
 import React, { useEffect } from "react";
-import { Button, FlatList, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Button,
+  Dimensions,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
 import { Card } from "./src/models/Card";
 import CardStore from "./src/stores/CardStore";
@@ -26,9 +33,11 @@ function App() {
     setupCardStore();
   }, []);
 
+  var deviceWidth = Dimensions.get("window").width;
+
   return (
     <Provider cardStore={cardStore}>
-      <ScrollView horizontal>
+      <ScrollView horizontal style={styles.scrollView}>
         <FlatList
           data={Object.values(cardStore.columns)}
           contentContainerStyle={styles.container}
@@ -49,7 +58,9 @@ const styles = StyleSheet.create({
     height: "100%",
     paddingHorizontal: 20,
     backgroundColor: "#424242",
+    width: Dimensions.get("window").width,
   },
+  scrollView: { width: Dimensions.get("window").width },
 });
 
 export default observer(App);
