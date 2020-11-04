@@ -104,7 +104,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   if (focused) {
     cardBackground = "#fcfcfc";
   } else if (cardStore.relatedToFocused(card)) {
-    cardBackground = "#e0e0e0";
+    cardBackground = "#bdbdbd";
   } else {
     cardBackground = "#616161";
   }
