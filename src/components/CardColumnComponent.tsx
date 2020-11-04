@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   StyleProp,
+  ViewStyle,
 } from "react-native";
 import { Card } from "../models/Card";
 import CardComponent from "./CardComponent";
@@ -28,7 +29,8 @@ export default observer(function CardColumnComponent(props: { cards: Card[] }) {
         // console.log(`Mouse over column ${cards.slice()[0].level}`);
       }}
       onWheel={(e) => {
-        setOffset(offset + e.nativeEvent.deltaY);
+        const _offset = Math.max(0, offset + e.nativeEvent.deltaY);
+        setOffset(_offset);
       }}
       style={{
         position: "relative",
@@ -37,7 +39,7 @@ export default observer(function CardColumnComponent(props: { cards: Card[] }) {
     >
       <FlatList
         data={cards}
-        contentContainerStyle={offsetContainerStyle}
+        contentContainerStyle={offsetContainerStyle as StyleProp<ViewStyle>}
         keyExtractor={(_item) => `${_item.id}-card`}
         renderItem={({ item: card }) => <CardComponent card={card} />}
       />
