@@ -16,6 +16,7 @@ import CardStore from "./src/stores/CardStore";
 const cardStore = new CardStore();
 let reset: boolean;
 reset = false; // switch to true and back to reset
+// reset = true
 
 if (reset) {
   cardStore.addCard("0");
@@ -32,8 +33,6 @@ function App() {
 
     setupCardStore();
   }, []);
-
-  var deviceWidth = Dimensions.get("window").width;
 
   return (
     <Provider cardStore={cardStore}>

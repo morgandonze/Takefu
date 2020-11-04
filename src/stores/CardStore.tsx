@@ -45,7 +45,7 @@ export default class CardStore {
       content,
       id: uuid(),
       level: parent ? parent.level + 1 : 0,
-      index: parent ? parent.children.length : 0, // replace 0 with number of level 0 cards
+      order: parent ? parent.children.length : 0, // replace 0 with number of level 0 cards
       parentId: parent ? parent.id : null,
       children: [],
     };
@@ -113,9 +113,9 @@ export default class CardStore {
   getLineage(card: Card, lineage: number[] = []): number[] {
     const parent = this.getCard(card.parentId as string);
     if (parent) {
-      return this.getLineage(parent, [card.index, ...lineage]);
+      return this.getLineage(parent, [card.order, ...lineage]);
     } else {
-      return [card.index, ...lineage];
+      return [card.order, ...lineage];
     }
   }
 

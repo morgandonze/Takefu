@@ -116,6 +116,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   ]);
 
   const addChild = async () => {
+    const lineage = cardStore.getLineage(card);
     const newCard = cardStore.addCard(
       `${lineage},${card.children.length}`,
       card
@@ -124,7 +125,18 @@ export default observer(function CardComponent(props: { card: Card }) {
     await cardStore.saveCards();
   };
 
-  const addSibling = async () => {};
+  const addSibling = async () => {
+    const parent: Card = cardStore.cards.find((parent: Card) => {
+      return parent.id == card.parentId;
+    });
+    const lineage = parent ? cardStore.getLineage(parent) : "";
+    const newCard = cardStore.addCard(
+      parent ? `${lineage},${parent.children.length}` : "new card",
+      parent
+    );
+    parent?.children.push(newCard);
+    await cardStore.saveCards();
+  };
 
   const deleteCard = async () => {
     try {
@@ -135,13 +147,11 @@ export default observer(function CardComponent(props: { card: Card }) {
     }
   };
 
-  const lineage = cardStore.getLineage(card);
-
   const childPlusStyle = StyleSheet.flatten([
     styles.plusButton,
     {
-      left: 300,
-      bottom: 60,
+      left: 305,
+      bottom: 62,
     },
   ]);
 
@@ -149,15 +159,15 @@ export default observer(function CardComponent(props: { card: Card }) {
     styles.plusButton,
     {
       left: 140,
-      bottom: 10,
+      bottom: 5,
     },
   ]);
 
   const cardMinusStyle = StyleSheet.flatten([
     styles.plusButton,
     {
-      left: 300,
-      bottom: 90,
+      left: 305,
+      bottom: 92,
     },
   ]);
 
