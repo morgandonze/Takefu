@@ -29,6 +29,7 @@ function App() {
         await cardStore.saveCards();
       }
       await cardStore.loadCards();
+      cardStore.focusRoot()
     };
 
     setupCardStore();

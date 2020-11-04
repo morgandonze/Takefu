@@ -40,6 +40,13 @@ export default class CardStore {
     }
   }
 
+  focusRoot() {
+    const root = this.cards.find((card: Card) => {
+      return card.level == 0 && card.order == 0;
+    });
+    this.focused = root || null;
+  }
+
   getLineage(card: Card, lineage: number[] = []): number[] {
     const parent = this.getCard(card.parentId as string);
     if (parent) {
@@ -104,7 +111,6 @@ export default class CardStore {
     const index = this.cards.findIndex((card: Card, index: number) => {
       return card.id == cardId;
     });
-    const origCard = this.cards[index];
     this.cards[index] = card;
   }
 
