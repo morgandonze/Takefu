@@ -24,6 +24,8 @@ export default class CardStore {
     try {
       const cardsJSON = (await AsyncStorage.getItem("cards")) || "";
       this.cards = JSON.parse(cardsJSON);
+      console.log('LOAD');
+      console.log(this.cards.slice());
     } catch (e) {
       this.cards = [];
     }
@@ -49,6 +51,28 @@ export default class CardStore {
     };
     this.cards.push(card);
     return card;
+  }
+
+  deleteCard(card: Card) {
+    // remove as child from parents
+    const parent: Card | undefined = this.cards.find((_card) => {
+      return _card.id == card.parentId;
+    });
+
+    if (parent) {
+      // remove child from parent.children
+      const childArrayIndex = parent.children.findIndex((child: Card) => {
+        return child.id == card.id;
+      });
+      console.log(card.content, parent?.content, childArrayIndex);
+      parent.children.splice(childArrayIndex, 1);
+    }
+
+    // // delete from cards
+    const cardIndex = this.cards.findIndex((_card) => {
+      return _card.id == card.id;
+    });
+    this.cards.splice(cardIndex, 1);
   }
 
   updateCard(cardId: string, card: Card) {
@@ -100,20 +124,21 @@ export default class CardStore {
       const lineageA: number[] = _this.getLineage(cardA);
       const lineageB: number[] = _this.getLineage(cardB);
 
-      if (lineageA.length != lineageB.length) { return 0}
-      
-      for (var i=0; i<lineageA.length; i++) {
+      if (lineageA.length != lineageB.length) {
+        return 0;
+      }
+
+      for (var i = 0; i < lineageA.length; i++) {
         if (lineageA[i] < lineageB[i]) {
-          return -1
+          return -1;
         } else if (lineageA[i] > lineageB[i]) {
-          return 1
+          return 1;
         }
       }
 
-      return 0
+      return 0;
     };
   }
-
 
   sortColumns(columns: Card[][]): Card[][] {
     for (var col = 0; col < columns.length; col++) {

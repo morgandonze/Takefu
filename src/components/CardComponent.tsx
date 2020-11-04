@@ -15,8 +15,12 @@ function useStores() {
   return React.useContext(MobXProviderContext);
 }
 
-const AddButton = function (props: { onPress(): any; style: any }) {
-  const { onPress, style } = props;
+const AddButton = function (props: {
+  onPress(): any;
+  style: any;
+  symbol: string;
+}) {
+  const { onPress, style, symbol } = props;
   const [mouseOver, setMouseOver] = useState(false);
 
   const _style = StyleSheet.flatten([
@@ -37,7 +41,7 @@ const AddButton = function (props: { onPress(): any; style: any }) {
     >
       <TouchableOpacity style={_style} onPress={onPress}>
         <View style={styles.plus}>
-          <Text>+</Text>
+          <Text>{symbol}</Text>
         </View>
       </TouchableOpacity>
     </div>
@@ -122,6 +126,15 @@ export default observer(function CardComponent(props: { card: Card }) {
 
   const addSibling = async () => {};
 
+  const deleteCard = async () => {
+    try {
+      cardStore.deleteCard(card);
+      await cardStore.saveCards();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const lineage = cardStore.getLineage(card);
 
   const childPlusStyle = StyleSheet.flatten([
@@ -137,6 +150,14 @@ export default observer(function CardComponent(props: { card: Card }) {
     {
       left: 140,
       bottom: 10,
+    },
+  ]);
+
+  const cardMinusStyle = StyleSheet.flatten([
+    styles.plusButton,
+    {
+      left: 300,
+      bottom: 90,
     },
   ]);
 
@@ -161,8 +182,9 @@ export default observer(function CardComponent(props: { card: Card }) {
         />
       </TouchableOpacity>
 
-      <AddButton onPress={addChild} style={childPlusStyle} />
-      <AddButton onPress={addSibling} style={siblingPlusStyle} />
+      <AddButton symbol={"+"} onPress={addChild} style={childPlusStyle} />
+      <AddButton symbol={"+"} onPress={addSibling} style={siblingPlusStyle} />
+      <AddButton symbol={"-"} onPress={deleteCard} style={cardMinusStyle} />
     </TouchableOpacity>
   );
 });
