@@ -49,10 +49,14 @@ export default class CardStore {
     }
   }
 
-  addCard(content: string, parent: Card | null = null): Card {
-    const baseCards = this.cards.filter((card: Card) => {
+  baseCards(): Card[] {
+    return this.cards.filter((card: Card) => {
       return card.level == 0;
     });
+  }
+
+  addCard(content: string, parent: Card | null = null): Card {
+    const baseCards = this.baseCards();
 
     const card: Card = {
       content,
@@ -66,13 +70,21 @@ export default class CardStore {
     return card;
   }
 
-  deleteCard(card: Card) {
-    // remove as child from parents
-    const parent: Card | undefined = this.cards.find((_card) => {
-      return _card.id == card.parentId;
-    });
+  deleteCard(card: Card, first = true) {
+    // delete all child cards recursively
+    for (var i = 0; i < card.children.length; i++) {
+      this.deleteCard(card.children[i], false);
+    }
 
-    if (parent) {
+    // disallow deleting last card
+    // TODO disallow deleting last root card
+    if (this.baseCards().includes(card) && this.baseCards().length <= 1) {
+      return null;
+    }
+
+    // remove as child from parents
+    const parent: Card | null = this.getCard(card.parentId);
+    if (first && parent) {
       // remove child from parent.children
       const childArrayIndex = parent.children.findIndex((child: Card) => {
         return child.id == card.id;
@@ -81,7 +93,7 @@ export default class CardStore {
       parent.children.splice(childArrayIndex, 1);
     }
 
-    // // delete from cards
+    // delete from cards
     const cardIndex = this.cards.findIndex((_card) => {
       return _card.id == card.id;
     });
@@ -116,7 +128,8 @@ export default class CardStore {
     return this.sortColumns(Object.values(columnsObj));
   }
 
-  getCard(cardId: string): Card | null {
+  getCard(cardId?: string | null): Card | null {
+    if (!cardId) return null;
     const card = this.cards.find((card: Card) => {
       return card.id == cardId;
     });
