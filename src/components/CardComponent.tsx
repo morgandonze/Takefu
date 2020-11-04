@@ -97,7 +97,6 @@ export default observer(function CardComponent(props: { card: Card }) {
   const onFocus = (e: any) => {
     cardStore.focused = card;
     const lineage = cardStore.getLineage(card);
-    console.log(lineage);
   };
 
   let cardBackground: string;
@@ -126,7 +125,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   };
 
   const addSibling = async () => {
-    const parent: Card = cardStore.getCard(card.parentId)
+    const parent: Card = cardStore.getCard(card.parentId);
     const lineage = parent ? cardStore.getLineage(parent) : "";
     const newCard = cardStore.addCard(
       parent ? `${lineage},${parent.children.length}` : "new card",

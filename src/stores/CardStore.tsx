@@ -5,7 +5,7 @@ import { v4 as uuid } from "uuid";
 
 export default class CardStore {
   cards: Card[] = [];
-  editingId: number | null = null;
+  editingId: string | null = null;
   focused: Card | null = null;
 
   constructor() {
@@ -140,6 +140,41 @@ export default class CardStore {
       return card.id == cardId;
     });
     return card || null;
+  }
+
+  focusSibling(delta: 1 | -1) {
+    const card = this.focused;
+    if (!card) return;
+    const parent = this.getCard(card.parentId);
+    let focusTo;
+
+    if (!parent) {
+      const cards = this.baseCards();
+      focusTo = cards.find((otherCard: Card) => {
+        return otherCard.order == card.order + delta;
+      });
+    } else {
+      focusTo = parent?.children.find((otherCard: Card) => {
+        return otherCard.order == card.order + delta;
+      });
+    }
+
+    if (focusTo) this.focused = this.getCard(focusTo.id);
+  }
+
+  focusChildren() {
+    const card = this.focused;
+    if (!card) return;
+    const children = card.children.slice();
+    const focusTo = children[0] ? this.getCard(children[0].id) : null;
+    if (focusTo) this.focused = focusTo;
+  }
+
+  focusParent() {
+    const card = this.focused;
+    if (!card) return;
+    const focusTo = this.getCard(card.parentId);
+    if (focusTo) this.focused = focusTo;
   }
 
   orderCards(_this: any) {
