@@ -212,7 +212,7 @@ export default class CardStore {
     );
   }
 
-  descendsFrom(cardA: Card, cardB: Card | null): boolean {
+  descendsFrom(cardA: Card | null, cardB: Card | null): boolean {
     const cardAParent = this.getCard(cardA?.parentId as string);
     if (!cardA || !cardB || !cardAParent) {
       return false;
