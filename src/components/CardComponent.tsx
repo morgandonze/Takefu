@@ -126,9 +126,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   };
 
   const addSibling = async () => {
-    const parent: Card = cardStore.cards.find((parent: Card) => {
-      return parent.id == card.parentId;
-    });
+    const parent: Card = cardStore.getCard(card.parentId)
     const lineage = parent ? cardStore.getLineage(parent) : "";
     const newCard = cardStore.addCard(
       parent ? `${lineage},${parent.children.length}` : "new card",

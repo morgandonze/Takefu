@@ -24,7 +24,7 @@ export default class CardStore {
     try {
       const cardsJSON = (await AsyncStorage.getItem("cards")) || "";
       this.cards = JSON.parse(cardsJSON);
-      console.log('LOAD');
+      console.log("LOAD");
       console.log(this.cards.slice());
     } catch (e) {
       this.cards = [];
@@ -40,12 +40,25 @@ export default class CardStore {
     }
   }
 
+  getLineage(card: Card, lineage: number[] = []): number[] {
+    const parent = this.getCard(card.parentId as string);
+    if (parent) {
+      return this.getLineage(parent, [card.order, ...lineage]);
+    } else {
+      return [card.order, ...lineage];
+    }
+  }
+
   addCard(content: string, parent: Card | null = null): Card {
+    const baseCards = this.cards.filter((card: Card) => {
+      return card.level == 0;
+    });
+
     const card: Card = {
       content,
       id: uuid(),
       level: parent ? parent.level + 1 : 0,
-      order: parent ? parent.children.length : 0, // replace 0 with number of level 0 cards
+      order: parent ? parent.children.length : baseCards.length, // replace 0 with number of level 0 cards
       parentId: parent ? parent.id : null,
       children: [],
     };
@@ -108,15 +121,6 @@ export default class CardStore {
       return card.id == cardId;
     });
     return card || null;
-  }
-
-  getLineage(card: Card, lineage: number[] = []): number[] {
-    const parent = this.getCard(card.parentId as string);
-    if (parent) {
-      return this.getLineage(parent, [card.order, ...lineage]);
-    } else {
-      return [card.order, ...lineage];
-    }
   }
 
   orderCards(_this: any) {
