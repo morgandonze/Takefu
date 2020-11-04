@@ -17,10 +17,7 @@ export default observer(function CardColumnComponent(props: { cards: Card[] }) {
 
   const offsetContainerStyle = StyleSheet.flatten([
     styles.columnListContainer,
-    {
-      position: "relative",
-      top: offset,
-    },
+    {},
   ]);
 
   return (
@@ -33,16 +30,22 @@ export default observer(function CardColumnComponent(props: { cards: Card[] }) {
         setOffset(_offset);
       }}
       style={{
-        position: "relative",
-        top: offset,
+        height: "100%",
       }}
     >
-      <FlatList
-        data={cards}
-        contentContainerStyle={offsetContainerStyle as StyleProp<ViewStyle>}
-        keyExtractor={(_item) => `${_item.id}-card`}
-        renderItem={({ item: card }) => <CardComponent card={card} />}
-      />
+      <View
+        style={{
+          position: "relative",
+          top: offset,
+        }}
+      >
+        <FlatList
+          data={cards}
+          contentContainerStyle={offsetContainerStyle as StyleProp<ViewStyle>}
+          keyExtractor={(_item) => `${_item.id}-card`}
+          renderItem={({ item: card }) => <CardComponent card={card} />}
+        />
+      </View>
     </div>
   );
 });

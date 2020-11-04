@@ -22,7 +22,7 @@ const AddButton = function (props: { onPress(): any; style: any }) {
   const _style = StyleSheet.flatten([
     style,
     {
-      opacity: mouseOver ? 1 : 0.2
+      opacity: mouseOver ? 1 : 0.2,
     },
   ]);
 
@@ -93,7 +93,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   const onFocus = (e: any) => {
     cardStore.focused = card;
     const lineage = cardStore.getLineage(card);
-    console.log(lineage)
+    console.log(lineage);
   };
 
   let cardBackground: string;
@@ -170,10 +170,15 @@ export default observer(function CardComponent(props: { card: Card }) {
 const styles = StyleSheet.create({
   card: {
     padding: 20,
-    backgroundColor: "#fff",
-    borderWidth: 1,
+    borderRadius: 5,
     borderColor: "#ccc",
-    marginBottom: 2,
+    shadowOffset: {
+      width: 5,
+      height: 5,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    margin: 5,
     width: 350,
     zIndex: 1,
   },
@@ -184,6 +189,7 @@ const styles = StyleSheet.create({
   },
   plus: {
     backgroundColor: "#ffffff",
+    borderRadius: 5,
     width: 20,
     height: 20,
     justifyContent: "center",

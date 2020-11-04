@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { observer, Provider } from "mobx-react";
 import React, { useEffect } from "react";
-import { Button, FlatList, StyleSheet, View } from "react-native";
+import { Button, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
 import { Card } from "./src/models/Card";
 import CardStore from "./src/stores/CardStore";
@@ -28,14 +28,16 @@ function App() {
 
   return (
     <Provider cardStore={cardStore}>
-      <FlatList
-        data={Object.values(cardStore.columns)}
-        contentContainerStyle={styles.container}
-        keyExtractor={(item: Card[], index) => `${index}-column`}
-        renderItem={({ item: column }) => (
-          <CardColumnComponent cards={column} />
-        )}
-      />
+      <ScrollView horizontal>
+        <FlatList
+          data={Object.values(cardStore.columns)}
+          contentContainerStyle={styles.container}
+          keyExtractor={(item: Card[], index) => `${index}-column`}
+          renderItem={({ item: column }) => (
+            <CardColumnComponent cards={column} />
+          )}
+        />
+      </ScrollView>
       <StatusBar style="auto" />
     </Provider>
   );
