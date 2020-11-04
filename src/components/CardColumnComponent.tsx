@@ -7,12 +7,18 @@ import CardComponent from "./CardComponent";
 export default observer(function CardColumnComponent(props: { cards: Card[] }) {
   const { cards } = props;
   return (
-    <FlatList
-      data={cards}
-      contentContainerStyle={styles.columnListContainer}
-      keyExtractor={(_item, index) => `${_item.id}-card`}
-      renderItem={({ item: card }) => <CardComponent card={card} />}
-    />
+    <div
+      onMouseEnter={(e) => {
+        console.log(`Mouse over column ${cards.slice()[0].level}`);
+      }}
+    >
+      <FlatList
+        data={cards}
+        contentContainerStyle={styles.columnListContainer}
+        keyExtractor={(_item, index) => `${_item.id}-card`}
+        renderItem={({ item: card }) => <CardComponent card={card} />}
+      />
+    </div>
   );
 });
 

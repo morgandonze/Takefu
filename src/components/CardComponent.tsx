@@ -15,6 +15,35 @@ function useStores() {
   return React.useContext(MobXProviderContext);
 }
 
+const AddButton = function (props: { onPress(): any; style: any }) {
+  const { onPress, style } = props;
+  const [mouseOver, setMouseOver] = useState(false);
+
+  const _style = StyleSheet.flatten([
+    style,
+    {
+      opacity: mouseOver ? 1 : 0.2
+    },
+  ]);
+
+  return (
+    <div
+      onMouseEnter={(e) => {
+        setMouseOver(true);
+      }}
+      onMouseLeave={(e) => {
+        setMouseOver(false);
+      }}
+    >
+      <TouchableOpacity style={_style} onPress={onPress}>
+        <View style={styles.plus}>
+          <Text>+</Text>
+        </View>
+      </TouchableOpacity>
+    </div>
+  );
+};
+
 const CardText = function (props: {
   card: Card;
   editing: boolean;
@@ -97,7 +126,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   const childPlusStyle = StyleSheet.flatten([
     styles.plusButton,
     {
-      left: 280,
+      left: 300,
       bottom: 60,
     },
   ]);
@@ -106,7 +135,7 @@ export default observer(function CardComponent(props: { card: Card }) {
     styles.plusButton,
     {
       left: 140,
-      bottom: 25,
+      bottom: 10,
     },
   ]);
 
@@ -130,16 +159,9 @@ export default observer(function CardComponent(props: { card: Card }) {
           }}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={childPlusStyle} onPress={addChild}>
-        <View style={styles.x}>
-          <Text>+</Text>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity style={siblingPlusStyle} onPress={addSibling}>
-        <View style={styles.x}>
-          <Text>+</Text>
-        </View>
-      </TouchableOpacity>
+
+      <AddButton onPress={addChild} style={childPlusStyle} />
+      <AddButton onPress={addSibling} style={siblingPlusStyle} />
     </TouchableOpacity>
   );
 });
@@ -159,10 +181,10 @@ const styles = StyleSheet.create({
     height: 0,
     position: "relative",
   },
-  x: {
+  plus: {
     backgroundColor: "#ffffff",
-    width: 35,
-    height: 35,
+    width: 20,
+    height: 20,
     justifyContent: "center",
     alignItems: "center",
   },

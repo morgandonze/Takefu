@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { observer, Provider } from "mobx-react";
 import React, { useEffect } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { Button, FlatList, StyleSheet, View } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
 import { Card } from "./src/models/Card";
 import CardStore from "./src/stores/CardStore";
