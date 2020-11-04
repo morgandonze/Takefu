@@ -1,21 +1,44 @@
 import { observer } from "mobx-react";
-import React from "react";
-import { View, FlatList, StyleSheet, ScrollView } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+  StyleProp,
+} from "react-native";
 import { Card } from "../models/Card";
 import CardComponent from "./CardComponent";
 
 export default observer(function CardColumnComponent(props: { cards: Card[] }) {
   const { cards } = props;
+  const [offset, setOffset] = useState(0);
+
+  const offsetContainerStyle = StyleSheet.flatten([
+    styles.columnListContainer,
+    {
+      position: "relative",
+      top: offset,
+    },
+  ]);
+
   return (
     <div
       onMouseEnter={(e) => {
-        console.log(`Mouse over column ${cards.slice()[0].level}`);
+        // console.log(`Mouse over column ${cards.slice()[0].level}`);
+      }}
+      onWheel={(e) => {
+        setOffset(offset + e.nativeEvent.deltaY);
+      }}
+      style={{
+        position: "relative",
+        top: offset,
       }}
     >
       <FlatList
         data={cards}
-        contentContainerStyle={styles.columnListContainer}
-        keyExtractor={(_item, index) => `${_item.id}-card`}
+        contentContainerStyle={offsetContainerStyle}
+        keyExtractor={(_item) => `${_item.id}-card`}
         renderItem={({ item: card }) => <CardComponent card={card} />}
       />
     </div>
