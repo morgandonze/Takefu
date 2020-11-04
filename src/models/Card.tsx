@@ -3,6 +3,6 @@ export interface Card {
   content: string;
   level: number;
   index: number;
-  parent: Card | null;
+  parentId: string | null;
   children: Card[];
 }
