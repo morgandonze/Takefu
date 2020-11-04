@@ -8,7 +8,7 @@ import CardStore from "./src/stores/CardStore";
 
 const cardStore = new CardStore();
 let reset: boolean;
-reset = false; // switch to true and back to reset
+reset = true; // switch to true and back to reset
 
 if (reset) {
   cardStore.addCard("0");
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     height: "100%",
     paddingHorizontal: 20,
-    backgroundColor: "#d0d0d0",
+    backgroundColor: "#424242",
   },
 });
 

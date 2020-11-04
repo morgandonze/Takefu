@@ -102,7 +102,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   } else if (cardStore.relatedToFocused(card)) {
     cardBackground = "#e0e0e0";
   } else {
-    cardBackground = "#aaaaab";
+    cardBackground = "#616161";
   }
   const combineStyles = StyleSheet.flatten([
     styles.card,
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
       width: 5,
       height: 5,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
     margin: 5,
     width: 350,
