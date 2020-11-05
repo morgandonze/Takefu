@@ -62,6 +62,7 @@ export default class CardStore {
     });
   }
 
+  // pass parent to make new card as child, otherwise will be a base card
   addCard(content: string, parent: Card | null = null): Card {
     const baseCards = this.baseCards();
 
@@ -73,6 +74,76 @@ export default class CardStore {
       parentId: parent ? parent.id : null,
       children: observable.array(),
     };
+    this.cards.push(card);
+    return card;
+  }
+
+  addBaseCard(content: string, insertOrder?: number) {
+    const baseCards = this.baseCards();
+    if (!insertOrder) {
+      insertOrder = baseCards.length;
+    }
+
+    const card: Card = {
+      content,
+      id: uuid(),
+      level: 0,
+      order: baseCards.length,
+      parentId: null,
+      children: observable.array(),
+    };
+
+    for (let i = 0; i < baseCards.length; i++) {
+      baseCards[i].order = i;
+    }
+
+    this.cards.push(card);
+    return card;
+  }
+
+  addChildCard(content: string, parent: Card) {
+    const order: number =
+      1 +
+      parent.children
+        .map((child) => child.order)
+        .sort()
+        .reverse()[0];
+
+    const card: Card = {
+      content,
+      id: uuid(),
+      level: parent.level + 1,
+      order,
+      parentId: parent.id,
+      children: observable.array(),
+    };
+    this.cards.push(card);
+    return card;
+  }
+
+  addSiblingCard(content: string, sibling: Card) {
+    const parent = this.getCard(sibling.parentId);
+    if (!parent) {
+      // TODO add as root card
+      this.addBaseCard(content, sibling.order + 1);
+      return;
+    }
+    const card: Card = {
+      content,
+      id: uuid(),
+      level: sibling.level,
+      order: 0,
+      parentId: parent ? parent.id : null,
+      children: observable.array(),
+    };
+    const index = parent.children.findIndex((card) => card.id == sibling.id);
+    parent.children.splice(index, 0, card);
+
+    // Redo card order to accomodate new card
+    for (let i = 0; i < parent.children.length; i++) {
+      parent.children[i].order = i;
+    }
+
     this.cards.push(card);
     return card;
   }
@@ -167,7 +238,6 @@ export default class CardStore {
   }
 
   focusPrevSibling() {
-
     const card = this.focused;
     if (!card) return;
     const parent = this.getCard(card.parentId);
