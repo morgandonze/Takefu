@@ -228,11 +228,13 @@ export default class CardStore {
 
     // TODO sort a clone copy, not the original
     if (!parent) {
-      cards = this.baseCards().sort((a, b) =>
+      const dup = this.baseCards().map((x) => x);
+      cards = dup.sort((a, b) =>
         a.order < b.order ? -1 : a.order == b.order ? 0 : 1
       );
     } else {
-      cards = parent?.children.sort((a, b) =>
+      const dup = parent?.children.map((c) => c);
+      cards = dup.sort((a, b) =>
         a.order < b.order ? -1 : a.order == b.order ? 0 : 1
       );
     }
@@ -253,11 +255,13 @@ export default class CardStore {
 
     // TODO sort a clone copy, not the original
     if (!parent) {
-      cards = this.baseCards().sort((a, b) =>
+      const dup = this.baseCards().map((x) => x);
+      cards = dup.sort((a, b) =>
         a.order > b.order ? -1 : a.order == b.order ? 0 : 1
       );
     } else {
-      cards = parent?.children.sort((a, b) =>
+      const dup = parent?.children.map((x) => x);
+      cards = dup.sort((a, b) =>
         a.order > b.order ? -1 : a.order == b.order ? 0 : 1
       );
     }
@@ -273,7 +277,8 @@ export default class CardStore {
     const card = this.focused;
     if (!card) return;
     const children = card.children.slice();
-    const focusTo = children[0] ? this.getCard(children[0].id) : null;
+    const temp = children.find((c) => c.order == 0);
+    const focusTo = temp ? this.getCard(temp.id) : null;
     if (focusTo) this.focused = focusTo;
   }
 

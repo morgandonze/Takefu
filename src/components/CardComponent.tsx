@@ -189,7 +189,7 @@ export default observer(function CardComponent(props: { card: Card }) {
             setEditing(false);
           }}
         />
-        <Text>{card.children.map((c) => c.content)}</Text>
+        {/* <Text>{card.children.map((c) => c.content)}</Text> */}
       </TouchableOpacity>
 
       <AddButton symbol={"+"} onPress={addChild} style={childPlusStyle} />
