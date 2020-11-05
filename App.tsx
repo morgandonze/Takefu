@@ -35,6 +35,11 @@ function App() {
         onKeyPress={(e) => {
           const key = e.key;
           if (key == "Enter") {
+            if (cardStore.focused && !cardStore.editingId) {
+              cardStore.editingId = cardStore.focused.id;
+            } else {
+              cardStore.editingId = null;
+            }
           }
         }}
         onKeyDown={(e) => {
