@@ -148,7 +148,7 @@ export default class CardStore {
     return card;
   }
 
-  deleteCard(card: Card, first = true) {
+  deleteCard(card: Card, recursionStart = true) {
     // delete all child cards recursively
     for (var i = 0; i < card.children.length; i++) {
       this.deleteCard(card.children[i], false);
@@ -160,15 +160,19 @@ export default class CardStore {
       return null;
     }
 
-    // remove as child from parents
+    // remove as child from parent
     const parent: Card | null = this.getCard(card.parentId);
-    if (first && parent) {
+    if (recursionStart && parent) {
       // remove child from parent.children
       const childArrayIndex = parent.children.findIndex((child: Card) => {
         return child.id == card.id;
       });
-      console.log(card.content, parent?.content, childArrayIndex);
       parent.children.splice(childArrayIndex, 1);
+
+      // redo child orders
+      for (let i = 0; i < parent.children.length; i++) {
+        parent.children[i].order = i;
+      }
     }
 
     // delete from cards
