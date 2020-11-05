@@ -97,6 +97,7 @@ export default observer(function CardComponent(props: { card: Card }) {
   const onFocus = (e: any) => {
     cardStore.focused = card;
     const lineage = cardStore.getLineage(card);
+    console.log(lineage);
   };
 
   let cardBackground: string;
@@ -116,11 +117,11 @@ export default observer(function CardComponent(props: { card: Card }) {
 
   const addChild = async () => {
     const lineage = cardStore.getLineage(card);
-    const newCard = cardStore.addCard(
+    const newCard: Card = cardStore.addCard(
       `${lineage},${card.children.length}`,
       card
     );
-    card.children.push(newCard);
+    card.children.push(cardStore.getCard(newCard.id));
     await cardStore.saveCards();
   };
 
@@ -131,7 +132,7 @@ export default observer(function CardComponent(props: { card: Card }) {
       parent ? `${lineage},${parent.children.length}` : "new card",
       parent
     );
-    parent?.children.push(newCard);
+    parent?.children.push(cardStore.getCard(newCard.id));
     await cardStore.saveCards();
   };
 
@@ -181,12 +182,14 @@ export default observer(function CardComponent(props: { card: Card }) {
           editing={editing}
           card={card}
           onSave={async (content) => {
-            cardStore.updateCard(card.id, { ...card, content });
+            // cardStore.updateCard(card.id, { ...card, content });
+            card.content = content;
             await cardStore.saveCards();
             cardStore.editingId = null;
             setEditing(false);
           }}
         />
+        <Text>{card.children.map((c) => c.content)}</Text>
       </TouchableOpacity>
 
       <AddButton symbol={"+"} onPress={addChild} style={childPlusStyle} />

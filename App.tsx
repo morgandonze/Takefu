@@ -40,9 +40,9 @@ function App() {
         onKeyDown={(e) => {
           const key = e.nativeEvent.key;
           if (key == "ArrowDown" && cardStore.focused) {
-            cardStore.focusSibling(1);
+            cardStore.focusNextSibling();
           } else if (key == "ArrowUp" && cardStore.focused) {
-            cardStore.focusSibling(-1);
+            cardStore.focusPrevSibling();
           } else if (key == "ArrowRight" && cardStore.focused) {
             cardStore.focusChildren();
           } else if (key == "ArrowLeft" && cardStore.focused) {

@@ -4,7 +4,7 @@ import { Card } from "../models/Card";
 import { v4 as uuid } from "uuid";
 
 export default class CardStore {
-  cards: Card[] = [];
+  cards: Card[] = observable.array();
   editingId: string | null = null;
   focused: Card | null = null;
 
@@ -71,7 +71,7 @@ export default class CardStore {
       level: parent ? parent.level + 1 : 0,
       order: parent ? parent.children.length : baseCards.length, // replace 0 with number of level 0 cards
       parentId: parent ? parent.id : null,
-      children: [],
+      children: observable.array(),
     };
     this.cards.push(card);
     return card;
@@ -111,7 +111,9 @@ export default class CardStore {
     const index = this.cards.findIndex((card: Card, index: number) => {
       return card.id == cardId;
     });
-    this.cards[index] = card;
+    const temp = this.cards;
+    temp[index] = card;
+    this.cards = temp;
   }
 
   // Builds an index of cards by tree level
@@ -142,22 +144,47 @@ export default class CardStore {
     return card || null;
   }
 
-  focusSibling(delta: 1 | -1) {
+  focusNextSibling() {
     const card = this.focused;
     if (!card) return;
     const parent = this.getCard(card.parentId);
     let focusTo;
+    let cards;
 
     if (!parent) {
-      const cards = this.baseCards();
-      focusTo = cards.find((otherCard: Card) => {
-        return otherCard.order == card.order + delta;
-      });
+      cards = this.baseCards().sort((a, b) =>
+        a.order < b.order ? -1 : a.order == b.order ? 0 : 1
+      );
     } else {
-      focusTo = parent?.children.find((otherCard: Card) => {
-        return otherCard.order == card.order + delta;
-      });
+      cards = parent?.children;
     }
+
+    focusTo = cards.find((otherCard: Card) => {
+      return otherCard.order > card.order;
+    });
+
+    if (focusTo) this.focused = this.getCard(focusTo.id);
+  }
+
+  focusPrevSibling() {
+
+    const card = this.focused;
+    if (!card) return;
+    const parent = this.getCard(card.parentId);
+    let focusTo;
+    let cards;
+
+    if (!parent) {
+      cards = this.baseCards().sort((a, b) =>
+        a.order < b.order ? 1 : a.order == b.order ? 0 : -1
+      );
+    } else {
+      cards = parent?.children;
+    }
+
+    focusTo = cards.find((otherCard: Card) => {
+      return otherCard.order < card.order;
+    });
 
     if (focusTo) this.focused = this.getCard(focusTo.id);
   }
