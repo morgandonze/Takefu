@@ -226,12 +226,15 @@ export default class CardStore {
     let focusTo;
     let cards;
 
+    // TODO sort a clone copy, not the original
     if (!parent) {
       cards = this.baseCards().sort((a, b) =>
         a.order < b.order ? -1 : a.order == b.order ? 0 : 1
       );
     } else {
-      cards = parent?.children;
+      cards = parent?.children.sort((a, b) =>
+        a.order < b.order ? -1 : a.order == b.order ? 0 : 1
+      );
     }
 
     focusTo = cards.find((otherCard: Card) => {
@@ -248,12 +251,15 @@ export default class CardStore {
     let focusTo;
     let cards;
 
+    // TODO sort a clone copy, not the original
     if (!parent) {
       cards = this.baseCards().sort((a, b) =>
-        a.order < b.order ? 1 : a.order == b.order ? 0 : -1
+        a.order > b.order ? -1 : a.order == b.order ? 0 : 1
       );
     } else {
-      cards = parent?.children;
+      cards = parent?.children.sort((a, b) =>
+        a.order > b.order ? -1 : a.order == b.order ? 0 : 1
+      );
     }
 
     focusTo = cards.find((otherCard: Card) => {

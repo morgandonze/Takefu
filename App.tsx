@@ -9,7 +9,7 @@ import CardStore from "./src/stores/CardStore";
 const cardStore = new CardStore();
 let reset: boolean;
 reset = false; // switch to true and back to reset
-// reset = true
+// reset = true;
 
 if (reset) {
   cardStore.addCard("0");
