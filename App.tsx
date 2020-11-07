@@ -9,7 +9,7 @@ import CardStore from "./src/stores/CardStore";
 const cardStore = new CardStore();
 let reset: boolean;
 reset = false; // switch to true and back to reset
-// reset = true
+// reset = true;
 
 if (reset) {
   cardStore.addCard("0");
@@ -35,6 +35,11 @@ function App() {
         onKeyPress={(e) => {
           const key = e.key;
           if (key == "Enter") {
+            if (cardStore.focused && !cardStore.editingId) {
+              cardStore.editingId = cardStore.focused.id;
+            } else {
+              cardStore.editingId = null;
+            }
           }
         }}
         onKeyDown={(e) => {

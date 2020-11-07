@@ -62,6 +62,7 @@ export default class CardStore {
     });
   }
 
+  // pass parent to make new card as child, otherwise will be a base card
   addCard(content: string, parent: Card | null = null): Card {
     const baseCards = this.baseCards();
 
@@ -77,7 +78,77 @@ export default class CardStore {
     return card;
   }
 
-  deleteCard(card: Card, first = true) {
+  addBaseCard(content: string, insertOrder?: number) {
+    const baseCards = this.baseCards();
+    if (!insertOrder) {
+      insertOrder = baseCards.length;
+    }
+
+    const card: Card = {
+      content,
+      id: uuid(),
+      level: 0,
+      order: baseCards.length,
+      parentId: null,
+      children: observable.array(),
+    };
+
+    for (let i = 0; i < baseCards.length; i++) {
+      baseCards[i].order = i;
+    }
+
+    this.cards.push(card);
+    return card;
+  }
+
+  addChildCard(content: string, parent: Card) {
+    const order: number =
+      1 +
+      parent.children
+        .map((child) => child.order)
+        .sort()
+        .reverse()[0];
+
+    const card: Card = {
+      content,
+      id: uuid(),
+      level: parent.level + 1,
+      order,
+      parentId: parent.id,
+      children: observable.array(),
+    };
+    this.cards.push(card);
+    return card;
+  }
+
+  addSiblingCard(content: string, sibling: Card) {
+    const parent = this.getCard(sibling.parentId);
+    if (!parent) {
+      // TODO add as root card
+      this.addBaseCard(content, sibling.order + 1);
+      return;
+    }
+    const card: Card = {
+      content,
+      id: uuid(),
+      level: sibling.level,
+      order: 0,
+      parentId: parent ? parent.id : null,
+      children: observable.array(),
+    };
+    const index = parent.children.findIndex((card) => card.id == sibling.id);
+    parent.children.splice(index, 0, card);
+
+    // Redo card order to accomodate new card
+    for (let i = 0; i < parent.children.length; i++) {
+      parent.children[i].order = i;
+    }
+
+    this.cards.push(card);
+    return card;
+  }
+
+  deleteCard(card: Card, recursionStart = true) {
     // delete all child cards recursively
     for (var i = 0; i < card.children.length; i++) {
       this.deleteCard(card.children[i], false);
@@ -89,15 +160,19 @@ export default class CardStore {
       return null;
     }
 
-    // remove as child from parents
+    // remove as child from parent
     const parent: Card | null = this.getCard(card.parentId);
-    if (first && parent) {
+    if (recursionStart && parent) {
       // remove child from parent.children
       const childArrayIndex = parent.children.findIndex((child: Card) => {
         return child.id == card.id;
       });
-      console.log(card.content, parent?.content, childArrayIndex);
       parent.children.splice(childArrayIndex, 1);
+
+      // redo child orders
+      for (let i = 0; i < parent.children.length; i++) {
+        parent.children[i].order = i;
+      }
     }
 
     // delete from cards
@@ -151,12 +226,17 @@ export default class CardStore {
     let focusTo;
     let cards;
 
+    // TODO sort a clone copy, not the original
     if (!parent) {
-      cards = this.baseCards().sort((a, b) =>
+      const dup = this.baseCards().map((x) => x);
+      cards = dup.sort((a, b) =>
         a.order < b.order ? -1 : a.order == b.order ? 0 : 1
       );
     } else {
-      cards = parent?.children;
+      const dup = parent?.children.map((c) => c);
+      cards = dup.sort((a, b) =>
+        a.order < b.order ? -1 : a.order == b.order ? 0 : 1
+      );
     }
 
     focusTo = cards.find((otherCard: Card) => {
@@ -167,19 +247,23 @@ export default class CardStore {
   }
 
   focusPrevSibling() {
-
     const card = this.focused;
     if (!card) return;
     const parent = this.getCard(card.parentId);
     let focusTo;
     let cards;
 
+    // TODO sort a clone copy, not the original
     if (!parent) {
-      cards = this.baseCards().sort((a, b) =>
-        a.order < b.order ? 1 : a.order == b.order ? 0 : -1
+      const dup = this.baseCards().map((x) => x);
+      cards = dup.sort((a, b) =>
+        a.order > b.order ? -1 : a.order == b.order ? 0 : 1
       );
     } else {
-      cards = parent?.children;
+      const dup = parent?.children.map((x) => x);
+      cards = dup.sort((a, b) =>
+        a.order > b.order ? -1 : a.order == b.order ? 0 : 1
+      );
     }
 
     focusTo = cards.find((otherCard: Card) => {
@@ -193,7 +277,8 @@ export default class CardStore {
     const card = this.focused;
     if (!card) return;
     const children = card.children.slice();
-    const focusTo = children[0] ? this.getCard(children[0].id) : null;
+    const temp = children.find((c) => c.order == 0);
+    const focusTo = temp ? this.getCard(temp.id) : null;
     if (focusTo) this.focused = focusTo;
   }
 

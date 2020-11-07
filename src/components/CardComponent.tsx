@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Button,
   StyleSheet,
@@ -52,8 +52,9 @@ const CardText = function (props: {
   card: Card;
   editing: boolean;
   onSave(content: string): void;
+  setRef(ref: any): void;
 }) {
-  const { card, editing, onSave } = props;
+  const { card, editing, onSave, setRef } = props;
   const [content, setContent] = useState(card.content);
 
   if (!editing) {
@@ -68,6 +69,11 @@ const CardText = function (props: {
         <View>
           <TextInput
             style={{ borderWidth: 1, borderColor: "#333" }}
+            ref={(ref) => {
+              setRef(ref);
+              ref?.focus();
+            }}
+            onSubmitEditing={() => onSave(content)}
             value={content}
             onChangeText={(text) => {
               setContent(text);
@@ -85,9 +91,13 @@ export default observer(function CardComponent(props: { card: Card }) {
   const { card } = props;
   const [editing, setEditing] = useState(cardStore.editingId == card.id);
   const [focused, setFocused] = useState(cardStore.focused == card);
+  const textInputRef = useRef(null);
 
   useEffect(() => {
     setEditing(cardStore.editingId == card.id);
+    if (textInputRef.current) {
+      textInputRef.current.focus();
+    }
   }, [cardStore.editingId]);
 
   useEffect(() => {
@@ -95,9 +105,11 @@ export default observer(function CardComponent(props: { card: Card }) {
   }, [cardStore.focused]);
 
   const onFocus = (e: any) => {
-    cardStore.focused = card;
-    const lineage = cardStore.getLineage(card);
-    console.log(lineage);
+    if (!(e.type == "keydown" && e.key == "Enter")) {
+      cardStore.focused = card;
+      const lineage = cardStore.getLineage(card);
+      console.log(lineage);
+    }
   };
 
   let cardBackground: string;
@@ -181,6 +193,9 @@ export default observer(function CardComponent(props: { card: Card }) {
         <CardText
           editing={editing}
           card={card}
+          setRef={(ref) => {
+            textInputRef.current = ref;
+          }}
           onSave={async (content) => {
             // cardStore.updateCard(card.id, { ...card, content });
             card.content = content;
@@ -189,7 +204,7 @@ export default observer(function CardComponent(props: { card: Card }) {
             setEditing(false);
           }}
         />
-        <Text>{card.children.map((c) => c.content)}</Text>
+        {/* <Text>{card.children.map((c) => c.content)}</Text> */}
       </TouchableOpacity>
 
       <AddButton symbol={"+"} onPress={addChild} style={childPlusStyle} />
