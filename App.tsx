@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { observer, Provider } from "mobx-react";
 import React, { useEffect } from "react";
-import { Dimensions, FlatList, ScrollView, StyleSheet } from "react-native";
+import { Dimensions, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
 import { Card } from "./src/models/Card";
 import CardStore from "./src/stores/CardStore";
@@ -12,7 +12,7 @@ reset = false; // switch to true and back to reset
 // reset = true;
 
 if (reset) {
-  cardStore.addCard("0");
+  cardStore.addRootCard();
 }
 
 function App() {
@@ -29,59 +29,10 @@ function App() {
   }, []);
 
   return (
-    <Provider cardStore={cardStore}>
-      <div
-        style={{ height: "100%" }}
-        onKeyPress={(e) => {
-          const key = e.key;
-          if (key == "Enter") {
-            if (cardStore.focused && !cardStore.editingId) {
-              cardStore.editingId = cardStore.focused.id;
-            } else {
-              cardStore.editingId = null;
-            }
-          }
-        }}
-        onKeyDown={(e) => {
-          const key = e.nativeEvent.key;
-          if (key == "ArrowDown" && cardStore.focused) {
-            cardStore.focusNextSibling();
-          } else if (key == "ArrowUp" && cardStore.focused) {
-            cardStore.focusPrevSibling();
-          } else if (key == "ArrowRight" && cardStore.focused) {
-            cardStore.focusChildren();
-          } else if (key == "ArrowLeft" && cardStore.focused) {
-            cardStore.focusParent();
-          } else {
-            console.log(key);
-          }
-        }}
-      >
-        <ScrollView horizontal style={styles.scrollView}>
-          <FlatList
-            data={Object.values(cardStore.columns)}
-            contentContainerStyle={styles.container}
-            keyExtractor={(item: Card[], index) => `${index}-column`}
-            renderItem={({ item: column }) => (
-              <CardColumnComponent cards={column} />
-            )}
-          />
-        </ScrollView>
-      </div>
-      <StatusBar style="auto" />
-    </Provider>
+    <View></View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    height: "100%",
-    paddingHorizontal: 20,
-    backgroundColor: "#424242",
-    width: Dimensions.get("window").width,
-  },
-  scrollView: { width: Dimensions.get("window").width, height: "100%" },
-});
+const styles = StyleSheet.create({});
 
 export default observer(App);

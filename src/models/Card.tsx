@@ -4,5 +4,5 @@ export interface Card {
   level: number;
   order: number;
   parentId: string | null;
-  children: Card[];
+  childIds: string[];
 }
