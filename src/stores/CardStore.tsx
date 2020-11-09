@@ -3,6 +3,16 @@ import { makeObservable, observable, action, computed } from "mobx";
 import { Card } from "../models/Card";
 import { v4 as uuid } from "uuid";
 
+export interface CardGroup {
+  cards: Card[];
+  parentId: string | null;
+  order?: number;
+}
+
+export interface Level {
+  groups: CardGroup[];
+}
+
 export default class CardStore {
   cards: Card[] = observable.array();
 
@@ -13,7 +23,7 @@ export default class CardStore {
       addRootCard: action,
       deleteCard: action,
       updateCardContent: action,
-      columns: computed,
+      levels: computed,
     });
   }
 
@@ -21,8 +31,86 @@ export default class CardStore {
   //                            Views
   //============================================================
 
-  // Returns card columns as an array of arrays
-  get columns(): Card[][] {}
+  maxLevel() {
+    let maxLevel = 0;
+    let card;
+    for (let i = 0; i <= this.cards.length; i++) {
+      card = this.cards[i];
+      if (card.level > maxLevel) {
+        maxLevel = card.level;
+      }
+    }
+    return maxLevel;
+  }
+
+  get levels(): Level[] {
+    const _levels: Level[] = []
+    for (let i=0; i<=this.maxLevel(); i++) {
+      _levels[i] = this.level(i)
+    }
+
+    return _levels
+  }
+
+  level(levelNum: number): Level {
+    const _level: Level = { groups: [] };
+    const levelCards = this.cards.filter((card) => card.level == levelNum);
+
+    let card: Card;
+    let group: CardGroup | undefined;
+    let parentId: string | null;
+    let order: number;
+
+    for (var i = 0; i <= levelCards.length; i++) {
+      card = levelCards[i];
+      group = _level.groups.find((g) => g.parentId == card.parentId);
+
+      if (!group) {
+        parentId = levelCards[i].parentId;
+        group = { parentId: parentId || null, cards: [] };
+        _level.groups.push();
+      }
+
+      group.cards.push(card);
+    }
+
+    // TODO set group orders
+    _level.groups.sort(this.groupSorter(this));
+
+    return _level;
+  }
+
+  groupSorter(_this: any) {
+    return (groupA: CardGroup, groupB: CardGroup) => {
+      const cardA = this.getCard(groupA.parentId);
+      const cardB = this.getCard(groupB.parentId);
+      const lineageA: number[] = _this.getLineage(cardA);
+      const lineageB: number[] = _this.getLineage(cardB);
+
+      if (lineageA.length != lineageB.length) {
+        return 0;
+      }
+
+      for (var i = 0; i < lineageA.length; i++) {
+        if (lineageA[i] < lineageB[i]) {
+          return -1;
+        } else if (lineageA[i] > lineageB[i]) {
+          return 1;
+        }
+      }
+
+      return 0;
+    };
+  }
+
+  getLineage(card: Card, lineage: number[] = []): number[] {
+    const parent = this.getCard(card.parentId as string);
+    if (parent) {
+      return this.getLineage(parent, [card.order, ...lineage]);
+    } else {
+      return [card.order, ...lineage];
+    }
+  }
 
   getCard(cardId?: string | null): Card | null {
     if (!cardId) return null;
@@ -128,18 +216,6 @@ export default class CardStore {
       }
     }
     card.order = order;
-
-    // update parent.childIds
-    const sortedIds = siblings
-      .sort((a, b) => {
-        if (!a || !b) {
-          return 0;
-        } else {
-          return a.order < b.order ? -1 : a.order > a.order ? 1 : 0;
-        }
-      })
-      .map((card) => card.id);
-    parent.childIds = sortedIds;
   }
 
   // use to remove order gaps caused by deleting cards
@@ -150,7 +226,6 @@ export default class CardStore {
       this.getCard(id)
     );
 
-    // Ensure childrenDup are sorted by order
     childrenDup.sort((a, b) => {
       if (!a || !b) {
         return 0;
@@ -168,8 +243,6 @@ export default class CardStore {
         child.order = i;
       }
     }
-
-    // TODO sort parent's childIds
   }
 
   changeCardGroup(cardId: string, newParentId: string, order: number) {
@@ -194,6 +267,7 @@ export default class CardStore {
     newParent?.childIds.push(cardId);
     card.parentId = newParentId;
     card.order = newParent.childIds.length;
+    card.level = newParent.level + 1;
     this.changeCardOrder(cardId, order);
   }
 
