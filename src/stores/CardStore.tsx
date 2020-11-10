@@ -9,8 +9,9 @@ export interface CardGroup {
   order?: number;
 }
 
-export interface Level {
+export interface LevelType {
   groups: CardGroup[];
+  levelNum: number;
 }
 
 export default class CardStore {
@@ -23,7 +24,6 @@ export default class CardStore {
       addRootCard: action,
       deleteCard: action,
       updateCardContent: action,
-      levels: computed,
     });
   }
 
@@ -34,7 +34,7 @@ export default class CardStore {
   maxLevel() {
     let maxLevel = 0;
     let card;
-    for (let i = 0; i <= this.cards.length; i++) {
+    for (let i = 0; i < this.cards.length; i++) {
       card = this.cards[i];
       if (card.level > maxLevel) {
         maxLevel = card.level;
@@ -43,17 +43,17 @@ export default class CardStore {
     return maxLevel;
   }
 
-  get levels(): Level[] {
-    const _levels: Level[] = []
-    for (let i=0; i<=this.maxLevel(); i++) {
-      _levels[i] = this.level(i)
+  levels(): LevelType[] {
+    const _levels: LevelType[] = [];
+    for (let i = 0; i <= this.maxLevel(); i++) {
+      _levels[i] = this.level(i);
     }
 
-    return _levels
+    return _levels;
   }
 
-  level(levelNum: number): Level {
-    const _level: Level = { groups: [] };
+  level(levelNum: number): LevelType {
+    const _level: LevelType = { groups: [], levelNum: levelNum };
     const levelCards = this.cards.filter((card) => card.level == levelNum);
 
     let card: Card;
@@ -61,14 +61,15 @@ export default class CardStore {
     let parentId: string | null;
     let order: number;
 
-    for (var i = 0; i <= levelCards.length; i++) {
+    for (var i = 0; i < levelCards.length; i++) {
       card = levelCards[i];
       group = _level.groups.find((g) => g.parentId == card.parentId);
 
       if (!group) {
         parentId = levelCards[i].parentId;
         group = { parentId: parentId || null, cards: [] };
-        _level.groups.push();
+        // console.log("group", group);
+        _level.groups.push(group);
       }
 
       group.cards.push(card);
@@ -145,6 +146,8 @@ export default class CardStore {
     if (order) {
       this.changeCardOrder(card.id, order);
     }
+
+    return card;
   }
 
   updateCardContent(cardId: string, content: string) {
@@ -285,14 +288,15 @@ export default class CardStore {
       childIds: [] as string[],
     };
     this.cards.push(rootCard);
+    return rootCard;
   }
 
   async loadCards() {
     try {
       const cardsJSON = (await AsyncStorage.getItem("cards")) || "";
       this.cards = JSON.parse(cardsJSON);
-      console.log("LOAD");
-      console.log(this.cards.slice());
+      // console.log("LOAD");
+      // console.log(this.cards.slice());
     } catch (e) {
       this.cards = [];
     }
