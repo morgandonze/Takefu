@@ -11,8 +11,9 @@ import {
 import CardColumnComponent from "./src/components/CardColumnComponent";
 import Level from "./src/components/Level";
 import { Card } from "./src/models/Card";
-import CardStore from "./src/stores/CardStore";
-import { DragDropContext } from "react-beautiful-dnd";
+import CardStore, { CardGroup, LevelType } from "./src/stores/CardStore";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import CardComponent from "./src/components/CardComponent";
 
 const cardStore = new CardStore();
 let reset: boolean;
@@ -50,32 +51,72 @@ function App() {
   let levels = cardStore.levels();
   console.log(levels);
 
+  const onDragEnd = (event: any) => {};
+
   // iterate over levels
   // in each level, iterate over groups
   // in each group, iterate over cards
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
-      <DragDropContext onDragEnd={(event) => {}}>
-        <FlatList
-          data={levels}
-          contentContainerStyle={{
-            height: "100%",
-            flex: 1,
-            flexDirection: "row",
-          }}
-          renderItem={({ item: level }) => (
-            <Level key={`level-${level.levelNum}`} level={level} />
-          )}
-        />
-      </DragDropContext>
-    </ScrollView>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <View style={styles.container0}>
+        {levels.map((level: LevelType, levelIndex: number) => (
+          <View style={styles.level}>
+            {level.groups.map((group: CardGroup, groupIndex: number) => (
+              <View style={{ borderWidth: 1, borderColor: "red" }}>
+                <Droppable
+                  droppableId={`column-${levelIndex}-${groupIndex}`}
+                  key={`column-${levelIndex}-${groupIndex}`}
+                  type="GROUP"
+                >
+                  {(provided: any, snapshot: any) => (
+                    <View
+                      ref={provided.innerRef}
+                      style={
+                        {
+                          // backgroundColor: snapshot.isDraggingOver
+                          //   ? "lightblue"
+                          //   : "lightgrey",
+                        }
+                      }
+                      {...provided.droppableProps}
+                    >
+                      {group.cards.map((card: Card, cardIndex: number) => (
+                        <CardComponent card={card} index={cardIndex} />
+                      ))}
+                      {provided.placeholder}
+                    </View>
+                  )}
+                </Droppable>
+              </View>
+            ))}
+          </View>
+        ))}
+      </View>
+    </DragDropContext>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
+  container0: {
+    flexDirection: "row",
+    display: "flex",
+    height: "100%",
     backgroundColor: "#ccc",
+  },
+  container: {
+    flexDirection: "row",
+    backgroundColor: "#ccc",
+  },
+  level: {
+    // width: 200,
+    margin: 20,
+  },
+  card: {
+    width: 200,
+    backgroundColor: "#fcfcfc",
+    height: 50,
+    borderRadius: 5,
+    marginVertical: 10,
   },
 });
 

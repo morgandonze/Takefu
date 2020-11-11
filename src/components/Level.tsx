@@ -31,17 +31,13 @@ function CardGroupComponent(props: { group: CardGroup }) {
             backgroundColor: snapshot.isDraggingOver
               ? "lightblue"
               : "lightgrey",
-            zIndex: -1
+            zIndex: -1,
           }}
           {...provided.droppableProps}
         >
-          <FlatList
-            data={cards}
-            keyExtractor={(_item) => `${_item.id}-card`}
-            renderItem={({ item: card, index }) => (
-              <CardComponent card={card} key={`card-${index}`} index={index} />
-            )}
-          />
+          {cards.map((card, index) => (
+            <CardComponent card={card} key={`card-${index}`} index={index} />
+          ))}
           {provided.placeholder}
         </div>
       )}

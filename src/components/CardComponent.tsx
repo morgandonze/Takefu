@@ -28,6 +28,7 @@ export default observer(function CardComponent(props: {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          // style={{zIndex: 900}}
         >
           <View style={styles.card}>
             <Text>{card.content}</Text>
