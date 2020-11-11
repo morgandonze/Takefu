@@ -62,24 +62,14 @@ function App() {
         {levels.map((level: LevelType, levelIndex: number) => (
           <View style={styles.level}>
             {level.groups.map((group: CardGroup, groupIndex: number) => (
-              <View style={{ borderWidth: 1, borderColor: "red" }}>
+              <View style={styles.group}>
                 <Droppable
                   droppableId={`column-${levelIndex}-${groupIndex}`}
                   key={`column-${levelIndex}-${groupIndex}`}
                   type="GROUP"
                 >
                   {(provided: any, snapshot: any) => (
-                    <View
-                      ref={provided.innerRef}
-                      style={
-                        {
-                          // backgroundColor: snapshot.isDraggingOver
-                          //   ? "lightblue"
-                          //   : "lightgrey",
-                        }
-                      }
-                      {...provided.droppableProps}
-                    >
+                    <View ref={provided.innerRef} {...provided.droppableProps}>
                       {group.cards.map((card: Card, cardIndex: number) => (
                         <CardComponent card={card} index={cardIndex} />
                       ))}
@@ -109,14 +99,12 @@ const styles = StyleSheet.create({
   },
   level: {
     // width: 200,
-    margin: 20,
+    margin: 10,
   },
-  card: {
-    width: 200,
-    backgroundColor: "#fcfcfc",
-    height: 50,
-    borderRadius: 5,
-    marginVertical: 10,
+  group: {
+    borderWidth: 1,
+    borderColor: "#eee",
+    marginVertical: 2,
   },
 });
 
