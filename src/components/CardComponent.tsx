@@ -84,8 +84,13 @@ export default observer(function CardComponent(props: {
     const content = `${card.content} Child`;
     cardStore.addCard(content, card.id);
   };
-  const addSibling = async () => {};
-  const deleteCard = async () => {};
+  const addSibling = async (card: Card) => {
+    const content = `${card.content} Sibling`;
+    cardStore.addCard(content, card.parentId);
+  };
+  const deleteCard = async (card: Card) => {
+    cardStore.deleteCard(card.id);
+  };
 
   return (
     <Draggable draggableId={card.id} index={index} key={`card-${card.id}`}>
@@ -105,12 +110,12 @@ export default observer(function CardComponent(props: {
             />
             <AddButton
               symbol={"+"}
-              onPress={addSibling}
+              onPress={() => addSibling(card)}
               style={siblingPlusStyle}
             />
             <AddButton
               symbol={"-"}
-              onPress={deleteCard}
+              onPress={() => deleteCard(card)}
               style={cardMinusStyle}
             />
           </View>
