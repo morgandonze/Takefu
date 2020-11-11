@@ -12,17 +12,40 @@ import {
 } from "react-native";
 import { CardGroup, LevelType } from "../stores/CardStore";
 import CardComponent from "./CardComponent";
+import { Droppable } from "react-beautiful-dnd";
 
 function CardGroupComponent(props: { group: CardGroup }) {
   const {
-    group: { cards },
+    group: { cards, parentId },
   } = props;
   return (
-    <FlatList
-      data={cards}
-      keyExtractor={(_item) => `${_item.id}-card`}
-      renderItem={({ item: card }) => <CardComponent card={card} />}
-    />
+    <Droppable
+      droppableId={`group-${parentId}`}
+      key={`group-${parentId}`}
+      type="GROUP"
+    >
+      {(provided: any, snapshot: any) => (
+        <div
+          ref={provided.innerRef}
+          style={{
+            backgroundColor: snapshot.isDraggingOver
+              ? "lightblue"
+              : "lightgrey",
+            zIndex: -1
+          }}
+          {...provided.droppableProps}
+        >
+          <FlatList
+            data={cards}
+            keyExtractor={(_item) => `${_item.id}-card`}
+            renderItem={({ item: card, index }) => (
+              <CardComponent card={card} key={`card-${index}`} index={index} />
+            )}
+          />
+          {provided.placeholder}
+        </div>
+      )}
+    </Droppable>
   );
 }
 
