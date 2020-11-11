@@ -24,17 +24,17 @@ let rootCard: Card;
 let root2: Card;
 if (reset) {
   rootCard = cardStore.addRootCard();
-  root2 = cardStore.addRootCard();
+  // root2 = cardStore.addRootCard();
 }
 
 function App() {
   useEffect(() => {
     const setupCardStore = async function () {
       if (reset) {
-        cardStore.addCard("card 1", rootCard.id);
-        cardStore.addCard("card 1", root2.id);
-        const card2 = cardStore.addCard("card 2", rootCard.id) as Card;
-        cardStore.addCard("card 3", card2.id);
+        // cardStore.addCard("card 1", rootCard.id);
+        // cardStore.addCard("card 1", root2.id);
+        // const card2 = cardStore.addCard("card 2", rootCard.id) as Card;
+        // cardStore.addCard("card 3", card2.id);
         await cardStore.saveCards();
       }
       await cardStore.loadCards();
@@ -57,32 +57,37 @@ function App() {
   // in each level, iterate over groups
   // in each group, iterate over cards
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <View style={styles.container0}>
-        {levels.map((level: LevelType, levelIndex: number) => (
-          <View style={styles.level}>
-            {level.groups.map((group: CardGroup, groupIndex: number) => (
-              <View style={styles.group}>
-                <Droppable
-                  droppableId={`column-${levelIndex}-${groupIndex}`}
-                  key={`column-${levelIndex}-${groupIndex}`}
-                  type="GROUP"
-                >
-                  {(provided: any, snapshot: any) => (
-                    <View ref={provided.innerRef} {...provided.droppableProps}>
-                      {group.cards.map((card: Card, cardIndex: number) => (
-                        <CardComponent card={card} index={cardIndex} />
-                      ))}
-                      {provided.placeholder}
-                    </View>
-                  )}
-                </Droppable>
-              </View>
-            ))}
-          </View>
-        ))}
-      </View>
-    </DragDropContext>
+    <Provider cardStore={cardStore}>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <View style={styles.container0}>
+          {levels.map((level: LevelType, levelIndex: number) => (
+            <View style={styles.level}>
+              {level.groups.map((group: CardGroup, groupIndex: number) => (
+                <View style={styles.group}>
+                  <Droppable
+                    droppableId={`column-${levelIndex}-${groupIndex}`}
+                    key={`column-${levelIndex}-${groupIndex}`}
+                    type="GROUP"
+                  >
+                    {(provided: any, snapshot: any) => (
+                      <View
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                      >
+                        {group.cards.map((card: Card, cardIndex: number) => (
+                          <CardComponent card={card} index={cardIndex} />
+                        ))}
+                        {provided.placeholder}
+                      </View>
+                    )}
+                  </Droppable>
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
+      </DragDropContext>
+    </Provider>
   );
 }
 

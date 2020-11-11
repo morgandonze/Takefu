@@ -53,11 +53,8 @@ export default observer(function CardComponent(props: {
   card: Card;
   index: number;
 }) {
+  const { cardStore } = useStores();
   const { card, index } = props;
-
-  const addChild = async () => {};
-  const addSibling = async () => {};
-  const deleteCard = async () => {};
 
   const childPlusStyle = StyleSheet.flatten([
     styles.plusButton,
@@ -83,6 +80,13 @@ export default observer(function CardComponent(props: {
     },
   ]);
 
+  const addChild = async (card: Card) => {
+    const content = `${card.content} Child`;
+    cardStore.addCard(content, card.id);
+  };
+  const addSibling = async () => {};
+  const deleteCard = async () => {};
+
   return (
     <Draggable draggableId={card.id} index={index} key={`card-${card.id}`}>
       {(provided: any, snapshot: any) => (
@@ -94,7 +98,11 @@ export default observer(function CardComponent(props: {
           <View style={styles.card}>
             <Text>{card.content}</Text>
 
-            <AddButton symbol={"+"} onPress={addChild} style={childPlusStyle} />
+            <AddButton
+              symbol={"+"}
+              onPress={() => addChild(card)}
+              style={childPlusStyle}
+            />
             <AddButton
               symbol={"+"}
               onPress={addSibling}

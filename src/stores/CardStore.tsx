@@ -127,7 +127,6 @@ export default class CardStore {
 
   addCard(content: string, parentId: string, order?: number): Card | undefined {
     const parent: Card | null = this.getCard(parentId);
-
     if (!parent) return;
 
     const card: Card = {
