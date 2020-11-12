@@ -53,8 +53,15 @@ export default observer(function CardComponent(props: {
   card: Card;
   index: number;
 }) {
-  const { cardStore } = useStores();
+  const { cardStore, uiStore } = useStores();
   const { card, index } = props;
+
+  const [editing, setEditing] = useState(uiStore.editingId == card.id);
+  const [content, setContent] = useState(card.content);
+
+  useEffect(() => {
+    setEditing(uiStore.editingId == card.id);
+  }, [uiStore.editingId]);
 
   const childPlusStyle = StyleSheet.flatten([
     styles.plusButton,
@@ -81,15 +88,22 @@ export default observer(function CardComponent(props: {
   ]);
 
   const addChild = async (card: Card) => {
-    const content = `${card.content} Child`;
+    const lineage = cardStore.getLineage(card);
+    const content = `${lineage},${card.childIds.length}`;
+    // const content = `${cardStore.getLineage(card)} ${
+    //   cardStore.getCard(card.parentId)?.children?.length
+    // }`;
     cardStore.addCard(content, card.id);
+    await cardStore.saveCards();
   };
   const addSibling = async (card: Card) => {
     const content = `${card.content} Sibling`;
     cardStore.addCard(content, card.parentId);
+    await cardStore.saveCards();
   };
   const deleteCard = async (card: Card) => {
     cardStore.deleteCard(card.id);
+    await cardStore.saveCards();
   };
 
   return (
@@ -100,8 +114,42 @@ export default observer(function CardComponent(props: {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <View style={styles.card}>
-            <Text>{card.content}</Text>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => {
+              if (!editing) {
+                uiStore.editingId = card.id;
+              } else {
+                uiStore.editingId = null;
+              }
+              setEditing(!editing);
+            }}
+          >
+            <View
+              style={{
+                display: !editing ? "flex" : "none",
+              }}
+            >
+              <Text>{card.content}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={{
+                display: editing ? "flex" : "none",
+              }}
+            >
+              <TextInput
+                style={{ borderWidth: 1, borderColor: "#333" }}
+                value={content}
+                onSubmitEditing={async () => {
+                  card.content = content;
+                  await cardStore.saveCards();
+                }}
+                onChangeText={(text) => {
+                  setContent(text);
+                }}
+              />
+            </TouchableOpacity>
 
             <AddButton
               symbol={"+"}
@@ -118,7 +166,7 @@ export default observer(function CardComponent(props: {
               onPress={() => deleteCard(card)}
               style={cardMinusStyle}
             />
-          </View>
+          </TouchableOpacity>
         </div>
       )}
     </Draggable>

@@ -14,8 +14,10 @@ import { Card } from "./src/models/Card";
 import CardStore, { CardGroup, LevelType } from "./src/stores/CardStore";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardComponent from "./src/components/CardComponent";
+import UIStore from "./src/stores/UIStore";
 
 const cardStore = new CardStore();
+const uiStore = new UIStore();
 let reset: boolean;
 reset = false; // switch to true and back to reset
 // reset = true;
@@ -49,7 +51,6 @@ function App() {
   // console.log(group && group.cards.map(c => c.content));
 
   let levels = cardStore.levels();
-  console.log(levels);
 
   const onDragEnd = (event: any) => {};
 
@@ -57,7 +58,7 @@ function App() {
   // in each level, iterate over groups
   // in each group, iterate over cards
   return (
-    <Provider cardStore={cardStore}>
+    <Provider cardStore={cardStore} uiStore={uiStore}>
       <DragDropContext onDragEnd={onDragEnd}>
         <View style={styles.container0}>
           {levels.map((level: LevelType, levelIndex: number) => (
@@ -103,7 +104,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
   },
   level: {
-    // width: 200,
     margin: 10,
   },
   group: {
