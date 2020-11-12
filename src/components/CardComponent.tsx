@@ -125,9 +125,11 @@ export default observer(function CardComponent(props: {
   const addChild = async (card: Card) => {
     const lineage = cardStore.getLineage(card);
     const content = `${lineage},${card.childIds.length}`;
+
     // const content = `${cardStore.getLineage(card)} ${
     //   cardStore.getCard(card.parentId)?.children?.length
     // }`;
+
     cardStore.addCard(content, card.id);
     await cardStore.saveCards();
   };

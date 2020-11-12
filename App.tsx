@@ -98,17 +98,18 @@ const styles = StyleSheet.create({
     display: "flex",
     height: "100%",
     backgroundColor: "#212121",
+    padding: 10,
   },
   container: {
     flexDirection: "row",
   },
   level: {
-    margin: 10,
+    marginRight: 5,
   },
   group: {
-    borderWidth: 1,
-    borderColor: "#424242",
-    marginVertical: 2,
+    borderBottomWidth: 3,
+    borderBottomColor: "#bdbdbd",
+    paddingVertical: 5,
   },
 });
 
