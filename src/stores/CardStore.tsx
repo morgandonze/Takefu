@@ -68,7 +68,6 @@ export default class CardStore {
       if (!group) {
         parentId = levelCards[i].parentId;
         group = { parentId: parentId || null, cards: [] };
-        // console.log("group", group);
         _level.groups.push(group);
       }
 
@@ -235,7 +234,6 @@ export default class CardStore {
   }
 
   changeCardOrder(cardId: string, order: number) {
-    console.log("CHANGING ORDER");
 
     const card = this.getCard(cardId);
     if (!card || !card.parentId) return;
@@ -249,7 +247,6 @@ export default class CardStore {
     const origOrder = card.order;
     let sibling;
 
-    console.log("reorder", order, origOrder);
     if (order > origOrder) {
       // moving card to later position
       for (var i = origOrder + 1; i <= order; i++) {
@@ -313,8 +310,6 @@ export default class CardStore {
     try {
       const cardsJSON = (await AsyncStorage.getItem("cards")) || "";
       this.cards = JSON.parse(cardsJSON);
-      // console.log("LOAD");
-      // console.log(this.cards.slice());
     } catch (e) {
       this.cards = [];
     }

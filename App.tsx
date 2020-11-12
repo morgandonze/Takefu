@@ -45,11 +45,6 @@ function App() {
     setupCardStore();
   }, []);
 
-  // const levels = cardStore.levels();
-  // console.log("LEVELS", levels.map(level => level.groups.slice()));
-  // let group =cardStore.level(1).groups[0]
-  // console.log(group && group.cards.map(c => c.content));
-
   let levels = cardStore.levels();
 
   const cardSorter = (cardA: Card, cardB: Card) => {
@@ -74,6 +69,7 @@ function App() {
     if (sourceDrop == destDrop) {
       cardStore.changeCardOrder(card.id, dest.index);
     } else {
+      console.log(source, dest, levels);
       const newParentId: string | null = ((levels[
         parseInt(destLevel)
       ] as LevelType).groups[parseInt(destGroup)] as CardGroup).parentId;

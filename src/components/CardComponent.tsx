@@ -146,9 +146,7 @@ export default observer(function CardComponent(props: {
     uiStore.focusedId = card.id;
     const focusedCard = cardStore.getCard(uiStore.focusedId);
     const parent = cardStore.getCard(focusedCard.parentId);
-    console.log("ON FOCUS");
     parent && console.log(focusedCard.level, parent.order, focusedCard.order);
-    // console.log(focusedCard.level, focusedCard.order);
   };
 
   let cardBackground: string;
