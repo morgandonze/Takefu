@@ -149,7 +149,7 @@ export default observer(function CardComponent(props: {
   if (focused) {
     cardBackground = "#fcfcfc";
   } else if (uiStore.relatedToFocused(card.id, cardStore)) {
-    cardBackground = "#bdbdbd";
+    cardBackground = "#9e9e9e";
   } else {
     cardBackground = "#616161";
   }
@@ -171,17 +171,17 @@ export default observer(function CardComponent(props: {
           <TouchableOpacity
             style={cardStyle}
             onPress={() => {
+              uiStore.editingId = null;
               onFocus();
             }}
           >
             <TouchableOpacity
               onPress={() => {
                 if (!editing) {
+                  onFocus();
                   uiStore.editingId = card.id;
-                } else {
-                  uiStore.editingId = null;
+                  setEditing(true);
                 }
-                setEditing(!editing);
               }}
             >
               <View
