@@ -107,9 +107,11 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   group: {
-    borderBottomWidth: 3,
-    borderBottomColor: "#bdbdbd",
-    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#424242",
+    // borderBottomRightRadius: 3,
+    // borderBottomLeftRadius: 3,
+    paddingVertical: 4,
   },
 });
 
