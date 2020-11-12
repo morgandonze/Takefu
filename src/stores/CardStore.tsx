@@ -121,6 +121,18 @@ export default class CardStore {
     return card || null;
   }
 
+  getCardByPosition(level: number, group: number, order: number): Card | null {
+    if (!level || !order) return null;
+    let parent;
+    const card = this.cards.find((card: Card) => {
+      parent = this.getCard(card.parentId);
+      return (
+        card.level == level && parent?.order == group && card.order == order
+      );
+    });
+    return card || null;
+  }
+
   //============================================================
   //                            Actions
   //============================================================
@@ -196,6 +208,8 @@ export default class CardStore {
   }
 
   changeCardOrder(cardId: string, order: number) {
+    console.log("CHANGING ORDER");
+
     const card = this.getCard(cardId);
     if (!card || !card.parentId) return;
     const parent = this.getCard(card.parentId);
@@ -207,17 +221,19 @@ export default class CardStore {
     const origOrder = card.order;
     let sibling;
     if (origOrder <= order) {
-      for (var i = origOrder; i <= order; i++) {
+      for (var i = origOrder; i < order; i++) {
         sibling = siblings[i];
         sibling.order--;
       }
     } else {
-      for (var i = order; i <= origOrder; i++) {
+      for (var i = order + 1; i <= origOrder; i++) {
         sibling = siblings[origOrder + order - i];
         sibling.order++;
       }
     }
+    console.log(card.order);
     card.order = order;
+    console.log(card.order);
   }
 
   // use to remove order gaps caused by deleting cards

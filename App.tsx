@@ -52,9 +52,26 @@ function App() {
 
   let levels = cardStore.levels();
 
+  const cardSorter = (cardA: Card, cardB: Card) => {
+    return cardA.order < cardB.order ? -1 : cardB.order < cardA.order ? 1 : 0;
+  };
+
   const onDragEnd = (event: any) => {
     const { source, destination: dest } = event;
-    console.log(source, dest);
+    if (source.droppableId == dest.droppableId) {
+      const sourceDrop: string = source.droppableId;
+      const [, level, group] = sourceDrop.split("-");
+      // console.log(source.index);
+      const card = cardStore.getCardByPosition(
+        parseInt(level),
+        parseInt(group),
+        source.index
+      );
+
+      if (!card) return;
+
+      cardStore.changeCardOrder(card.id, dest.index);
+    }
   };
 
   // iterate over levels
@@ -78,13 +95,15 @@ function App() {
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                       >
-                        {group.cards.map((card: Card, cardIndex: number) => (
-                          <CardComponent
-                            card={card}
-                            index={cardIndex}
-                            key={`card-component-${cardIndex}`}
-                          />
-                        ))}
+                        {group.cards
+                          .sort(cardSorter)
+                          .map((card: Card, cardIndex: number) => (
+                            <CardComponent
+                              card={card}
+                              index={cardIndex}
+                              key={`card-component-${cardIndex}`}
+                            />
+                          ))}
                         {provided.placeholder}
                       </View>
                     )}
