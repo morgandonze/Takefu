@@ -16,7 +16,6 @@ export default class UIStore {
   relatedToFocused(cardId: string, cardStore: CardStore): boolean {
     const card: Card | null = cardStore.getCard(cardId);
     const focused: Card | null = cardStore.getCard(this.focusedId);
-    console.log(focused, card);
     return (
       this.descendsFrom(card, focused, cardStore) ||
       this.descendsFrom(focused, card, cardStore)

@@ -52,7 +52,10 @@ function App() {
 
   let levels = cardStore.levels();
 
-  const onDragEnd = (event: any) => {};
+  const onDragEnd = (event: any) => {
+    const { source, destination: dest } = event;
+    console.log(source, dest);
+  };
 
   // iterate over levels
   // in each level, iterate over groups
@@ -62,9 +65,9 @@ function App() {
       <DragDropContext onDragEnd={onDragEnd}>
         <View style={styles.container0}>
           {levels.map((level: LevelType, levelIndex: number) => (
-            <View style={styles.level}>
+            <View style={styles.level} key={`level-${levelIndex}-view`}>
               {level.groups.map((group: CardGroup, groupIndex: number) => (
-                <View style={styles.group}>
+                <View style={styles.group} key={`group-${groupIndex}-view`}>
                   <Droppable
                     droppableId={`column-${levelIndex}-${groupIndex}`}
                     key={`column-${levelIndex}-${groupIndex}`}
@@ -76,7 +79,11 @@ function App() {
                         {...provided.droppableProps}
                       >
                         {group.cards.map((card: Card, cardIndex: number) => (
-                          <CardComponent card={card} index={cardIndex} />
+                          <CardComponent
+                            card={card}
+                            index={cardIndex}
+                            key={`card-component-${cardIndex}`}
+                          />
                         ))}
                         {provided.placeholder}
                       </View>
