@@ -58,19 +58,28 @@ function App() {
 
   const onDragEnd = (event: any) => {
     const { source, destination: dest } = event;
-    if (source.droppableId == dest.droppableId) {
-      const sourceDrop: string = source.droppableId;
-      const [, level, group] = sourceDrop.split("-");
-      // console.log(source.index);
-      const card = cardStore.getCardByPosition(
-        parseInt(level),
-        parseInt(group),
-        source.index
-      );
+    const sourceDrop: string = source.droppableId;
+    const destDrop: string = dest.droppableId;
+    const [, sourceLevel, sourceGroup] = sourceDrop.split("-");
+    const [, destLevel, destGroup] = destDrop.split("-");
 
-      if (!card) return;
+    const card = cardStore.getCardByPosition(
+      parseInt(sourceLevel),
+      parseInt(sourceGroup),
+      source.index
+    );
 
+    if (!card) return;
+
+    if (sourceDrop == destDrop) {
       cardStore.changeCardOrder(card.id, dest.index);
+    } else {
+      const newParentId: string | null = ((levels[
+        parseInt(destLevel)
+      ] as LevelType).groups[parseInt(destGroup)] as CardGroup).parentId;
+
+      if (!newParentId) return;
+      cardStore.changeCardGroup(card.id, newParentId, dest.index);
     }
   };
 

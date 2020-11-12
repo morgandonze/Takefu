@@ -207,37 +207,6 @@ export default class CardStore {
     this.cards.splice(cardIndex, 1);
   }
 
-  changeCardOrder(cardId: string, order: number) {
-    console.log("CHANGING ORDER");
-
-    const card = this.getCard(cardId);
-    if (!card || !card.parentId) return;
-    const parent = this.getCard(card.parentId);
-    if (!parent) return;
-
-    const siblings: (Card | null)[] = parent.childIds
-      .map((id) => this.getCard(id))
-
-    const origOrder = card.order;
-    let sibling;
-
-    console.log("reorder", order, origOrder)
-    if (order > origOrder) {
-      // moving card to later position
-      for (var i = origOrder + 1; i <= order; i++) {
-        sibling = siblings.find((s) => (s?.order == i))
-        if(sibling) sibling.order--;
-      }
-    } else if (order < origOrder || true) {
-      // moving card to earlier position
-      for (var i = origOrder - 1; i >= order; i--) {
-        sibling = siblings.find((s) => (s?.order == i))
-       if(sibling) sibling.order++;
-      }
-    }
-    card.order = order;
-  }
-
   // use to remove order gaps caused by deleting cards
   removeOrderGaps(parentId: string) {
     const parent = this.getCard(parentId);
@@ -263,6 +232,38 @@ export default class CardStore {
         child.order = i;
       }
     }
+  }
+
+  changeCardOrder(cardId: string, order: number) {
+    console.log("CHANGING ORDER");
+
+    const card = this.getCard(cardId);
+    if (!card || !card.parentId) return;
+    const parent = this.getCard(card.parentId);
+    if (!parent) return;
+
+    const siblings: (Card | null)[] = parent.childIds.map((id) =>
+      this.getCard(id)
+    );
+
+    const origOrder = card.order;
+    let sibling;
+
+    console.log("reorder", order, origOrder);
+    if (order > origOrder) {
+      // moving card to later position
+      for (var i = origOrder + 1; i <= order; i++) {
+        sibling = siblings.find((s) => s?.order == i);
+        if (sibling) sibling.order--;
+      }
+    } else if (order < origOrder || true) {
+      // moving card to earlier position
+      for (var i = origOrder - 1; i >= order; i--) {
+        sibling = siblings.find((s) => s?.order == i);
+        if (sibling) sibling.order++;
+      }
+    }
+    card.order = order;
   }
 
   changeCardGroup(cardId: string, newParentId: string, order: number) {
