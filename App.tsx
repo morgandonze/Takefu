@@ -1,87 +1,116 @@
 import { StatusBar } from "expo-status-bar";
 import { observer, Provider } from "mobx-react";
 import React, { useEffect } from "react";
-import { Dimensions, FlatList, ScrollView, StyleSheet } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import CardColumnComponent from "./src/components/CardColumnComponent";
+import Level from "./src/components/Level";
 import { Card } from "./src/models/Card";
-import CardStore from "./src/stores/CardStore";
+import CardStore, { CardGroup, LevelType } from "./src/stores/CardStore";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import CardComponent from "./src/components/CardComponent";
+import UIStore from "./src/stores/UIStore";
 
 const cardStore = new CardStore();
+const uiStore = new UIStore();
 let reset: boolean;
 reset = false; // switch to true and back to reset
 // reset = true;
 
+let rootCard: Card;
+let root2: Card;
 if (reset) {
-  cardStore.addCard("0");
+  rootCard = cardStore.addRootCard();
+  // root2 = cardStore.addRootCard();
 }
 
 function App() {
   useEffect(() => {
     const setupCardStore = async function () {
       if (reset) {
+        // cardStore.addCard("card 1", rootCard.id);
+        // cardStore.addCard("card 1", root2.id);
+        // const card2 = cardStore.addCard("card 2", rootCard.id) as Card;
+        // cardStore.addCard("card 3", card2.id);
         await cardStore.saveCards();
       }
       await cardStore.loadCards();
-      cardStore.focusRoot();
     };
 
     setupCardStore();
   }, []);
 
+  // const levels = cardStore.levels();
+  // console.log("LEVELS", levels.map(level => level.groups.slice()));
+  // let group =cardStore.level(1).groups[0]
+  // console.log(group && group.cards.map(c => c.content));
+
+  let levels = cardStore.levels();
+
+  const onDragEnd = (event: any) => {};
+
+  // iterate over levels
+  // in each level, iterate over groups
+  // in each group, iterate over cards
   return (
-    <Provider cardStore={cardStore}>
-      <div
-        style={{ height: "100%" }}
-        onKeyPress={(e) => {
-          const key = e.key;
-          if (key == "Enter") {
-            if (cardStore.focused && !cardStore.editingId) {
-              cardStore.editingId = cardStore.focused.id;
-            } else {
-              cardStore.editingId = null;
-            }
-          }
-        }}
-        onKeyDown={(e) => {
-          const key = e.nativeEvent.key;
-          if (key == "ArrowDown" && cardStore.focused) {
-            cardStore.focusNextSibling();
-          } else if (key == "ArrowUp" && cardStore.focused) {
-            cardStore.focusPrevSibling();
-          } else if (key == "ArrowRight" && cardStore.focused) {
-            cardStore.focusChildren();
-          } else if (key == "ArrowLeft" && cardStore.focused) {
-            cardStore.focusParent();
-          } else {
-            console.log(key);
-          }
-        }}
-      >
-        <ScrollView horizontal style={styles.scrollView}>
-          <FlatList
-            data={Object.values(cardStore.columns)}
-            contentContainerStyle={styles.container}
-            keyExtractor={(item: Card[], index) => `${index}-column`}
-            renderItem={({ item: column }) => (
-              <CardColumnComponent cards={column} />
-            )}
-          />
-        </ScrollView>
-      </div>
-      <StatusBar style="auto" />
+    <Provider cardStore={cardStore} uiStore={uiStore}>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <View style={styles.container0}>
+          {levels.map((level: LevelType, levelIndex: number) => (
+            <View style={styles.level}>
+              {level.groups.map((group: CardGroup, groupIndex: number) => (
+                <View style={styles.group}>
+                  <Droppable
+                    droppableId={`column-${levelIndex}-${groupIndex}`}
+                    key={`column-${levelIndex}-${groupIndex}`}
+                    type="GROUP"
+                  >
+                    {(provided: any, snapshot: any) => (
+                      <View
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                      >
+                        {group.cards.map((card: Card, cardIndex: number) => (
+                          <CardComponent card={card} index={cardIndex} />
+                        ))}
+                        {provided.placeholder}
+                      </View>
+                    )}
+                  </Droppable>
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
+      </DragDropContext>
     </Provider>
   );
 }
 
 const styles = StyleSheet.create({
+  container0: {
+    flexDirection: "row",
+    display: "flex",
+    height: "100%",
+    backgroundColor: "#212121",
+    padding: 10,
+  },
   container: {
     flexDirection: "row",
-    height: "100%",
-    paddingHorizontal: 20,
-    backgroundColor: "#424242",
-    width: Dimensions.get("window").width,
   },
-  scrollView: { width: Dimensions.get("window").width, height: "100%" },
+  level: {
+    marginRight: 5,
+  },
+  group: {
+    borderBottomWidth: 3,
+    borderBottomColor: "#bdbdbd",
+    paddingVertical: 5,
+  },
 });
 
 export default observer(App);

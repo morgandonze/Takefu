@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { Card } from "../models/Card";
+import { Draggable } from "react-beautiful-dnd";
 
 import { MobXProviderContext } from "mobx-react";
 function useStores() {
@@ -48,177 +49,11 @@ const AddButton = function (props: {
   );
 };
 
-const CardText = function (props: {
-  card: Card;
-  editing: boolean;
-  onSave(content: string): void;
-  setRef(ref: any): void;
-}) {
-  const { card, editing, onSave, setRef } = props;
-  const [content, setContent] = useState(card.content);
-
-  if (!editing) {
-    return (
-      <View style={{ marginBottom: 20 }}>
-        <Text>{content}</Text>
-      </View>
-    );
-  } else {
-    return (
-      <View style={{ marginBottom: 10 }}>
-        <View>
-          <TextInput
-            style={{ borderWidth: 1, borderColor: "#333" }}
-            ref={(ref) => {
-              setRef(ref);
-              ref?.focus();
-            }}
-            onSubmitEditing={() => onSave(content)}
-            value={content}
-            onChangeText={(text) => {
-              setContent(text);
-            }}
-          />
-        </View>
-        <Button title="done" onPress={() => onSave(content)} />
-      </View>
-    );
-  }
-};
-
-export default observer(function CardComponent(props: { card: Card }) {
-  const { cardStore } = useStores();
-  const { card } = props;
-  const [editing, setEditing] = useState(cardStore.editingId == card.id);
-  const [focused, setFocused] = useState(cardStore.focused == card);
-  const textInputRef = useRef(null);
-
-  useEffect(() => {
-    setEditing(cardStore.editingId == card.id);
-    if (textInputRef.current) {
-      textInputRef.current.focus();
-    }
-  }, [cardStore.editingId]);
-
-  useEffect(() => {
-    setFocused(cardStore.focused == card);
-  }, [cardStore.focused]);
-
-  const onFocus = (e: any) => {
-    if (!(e.type == "keydown" && e.key == "Enter")) {
-      cardStore.focused = card;
-      const lineage = cardStore.getLineage(card);
-      console.log(lineage);
-    }
-  };
-
-  let cardBackground: string;
-  if (focused) {
-    cardBackground = "#fcfcfc";
-  } else if (cardStore.relatedToFocused(card)) {
-    cardBackground = "#bdbdbd";
-  } else {
-    cardBackground = "#616161";
-  }
-  const combineStyles = StyleSheet.flatten([
-    styles.card,
-    {
-      backgroundColor: cardBackground,
-    },
-  ]);
-
-  const addChild = async () => {
-    const lineage = cardStore.getLineage(card);
-    const newCard: Card = cardStore.addCard(
-      `${lineage},${card.children.length}`,
-      card
-    );
-    card.children.push(cardStore.getCard(newCard.id));
-    await cardStore.saveCards();
-  };
-
-  const addSibling = async () => {
-    const parent: Card = cardStore.getCard(card.parentId);
-    const lineage = parent ? cardStore.getLineage(parent) : "";
-    const newCard = cardStore.addCard(
-      parent ? `${lineage},${parent.children.length}` : "new card",
-      parent
-    );
-    parent?.children.push(cardStore.getCard(newCard.id));
-    await cardStore.saveCards();
-  };
-
-  const deleteCard = async () => {
-    try {
-      cardStore.deleteCard(card);
-      await cardStore.saveCards();
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const childPlusStyle = StyleSheet.flatten([
-    styles.plusButton,
-    {
-      left: 305,
-      bottom: 62,
-    },
-  ]);
-
-  const siblingPlusStyle = StyleSheet.flatten([
-    styles.plusButton,
-    {
-      left: 140,
-      bottom: 5,
-    },
-  ]);
-
-  const cardMinusStyle = StyleSheet.flatten([
-    styles.plusButton,
-    {
-      left: 305,
-      bottom: 92,
-    },
-  ]);
-
-  return (
-    <TouchableOpacity style={combineStyles} onPress={onFocus}>
-      <TouchableOpacity
-        style={{ marginBottom: 40 }}
-        onPress={() => {
-          cardStore.editingId = card.id;
-          setEditing(true);
-        }}
-      >
-        <CardText
-          editing={editing}
-          card={card}
-          setRef={(ref) => {
-            textInputRef.current = ref;
-          }}
-          onSave={async (content) => {
-            // cardStore.updateCard(card.id, { ...card, content });
-            card.content = content;
-            await cardStore.saveCards();
-            cardStore.editingId = null;
-            setEditing(false);
-          }}
-        />
-        {/* <Text>{card.children.map((c) => c.content)}</Text> */}
-      </TouchableOpacity>
-
-      <AddButton symbol={"+"} onPress={addChild} style={childPlusStyle} />
-      <AddButton symbol={"+"} onPress={addSibling} style={siblingPlusStyle} />
-      <AddButton symbol={"-"} onPress={deleteCard} style={cardMinusStyle} />
-    </TouchableOpacity>
-  );
-});
-
 const styles = StyleSheet.create({
   card: {
     padding: 20,
     borderRadius: 5,
-    borderColor: "#ccc",
+    backgroundColor: "#bdbdbd",
     shadowOffset: {
       width: 5,
       height: 5,
@@ -227,7 +62,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     margin: 5,
     width: 350,
-    zIndex: 1,
+    minHeight: 100,
   },
   plusButton: {
     width: 0,
@@ -242,4 +77,160 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+});
+
+const childPlusStyle = StyleSheet.flatten([
+  styles.plusButton,
+  {
+    left: 305,
+    bottom: 0,
+  },
+]);
+
+const siblingPlusStyle = StyleSheet.flatten([
+  styles.plusButton,
+  {
+    left: 150,
+    bottom: -40,
+  },
+]);
+
+const cardMinusStyle = StyleSheet.flatten([
+  styles.plusButton,
+  {
+    left: 305,
+    bottom: 30,
+  },
+]);
+
+export default observer(function CardComponent(props: {
+  card: Card;
+  index: number;
+}) {
+  const { cardStore, uiStore } = useStores();
+  const { card, index } = props;
+
+  const [editing, setEditing] = useState(uiStore.editingId == card.id);
+  const [focused, setFocused] = useState(uiStore.focusedId == card.id);
+  const [content, setContent] = useState(card.content);
+
+  useEffect(() => {
+    setEditing(uiStore.editingId == card.id);
+  }, [uiStore.editingId]);
+
+  useEffect(() => {
+    setFocused(uiStore.focusedId == card.id);
+  }, [uiStore.focusedId]);
+
+  const addChild = async (card: Card) => {
+    const lineage = cardStore.getLineage(card);
+    const content = `${lineage},${card.childIds.length}`;
+
+    // const content = `${cardStore.getLineage(card)} ${
+    //   cardStore.getCard(card.parentId)?.children?.length
+    // }`;
+
+    cardStore.addCard(content, card.id);
+    await cardStore.saveCards();
+  };
+  const addSibling = async (card: Card) => {
+    const content = `${card.content} Sibling`;
+    cardStore.addCard(content, card.parentId);
+    await cardStore.saveCards();
+  };
+  const deleteCard = async (card: Card) => {
+    cardStore.deleteCard(card.id);
+    await cardStore.saveCards();
+  };
+  const onFocus = () => {
+    uiStore.focusedId = card.id;
+    console.log(uiStore.focusedId);
+  };
+
+  let cardBackground: string;
+  if (focused) {
+    cardBackground = "#fcfcfc";
+  } else if (uiStore.relatedToFocused(card.id, cardStore)) {
+    cardBackground = "#9e9e9e";
+  } else {
+    cardBackground = "#616161";
+  }
+  const cardStyle = StyleSheet.flatten([
+    styles.card,
+    {
+      backgroundColor: cardBackground,
+    },
+  ]);
+
+  return (
+    <Draggable draggableId={card.id} index={index} key={`card-${card.id}`}>
+      {(provided: any, snapshot: any) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <TouchableOpacity
+            style={cardStyle}
+            onPress={() => {
+              uiStore.editingId = null;
+              onFocus();
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                if (!editing) {
+                  onFocus();
+                  uiStore.editingId = card.id;
+                  setEditing(true);
+                }
+              }}
+            >
+              <View
+                style={{
+                  display: !editing ? "flex" : "none",
+                }}
+              >
+                <Text>{card.content}</Text>
+              </View>
+
+              <View
+                style={{
+                  display: editing ? "flex" : "none",
+                }}
+              >
+                <TextInput
+                  style={{ borderWidth: 1, borderColor: "#333" }}
+                  value={content}
+                  onSubmitEditing={async () => {
+                    card.content = content;
+                    await cardStore.saveCards();
+                  }}
+                  onChangeText={(text) => {
+                    setContent(text);
+                  }}
+                />
+              </View>
+            </TouchableOpacity>
+
+            <AddButton
+              symbol={"+"}
+              onPress={() => addChild(card)}
+              style={childPlusStyle}
+            />
+            <AddButton
+              symbol={"+"}
+              onPress={() => addSibling(card)}
+              style={siblingPlusStyle}
+            />
+            <AddButton
+              symbol={"-"}
+              onPress={() => deleteCard(card)}
+              style={cardMinusStyle}
+            />
+          </TouchableOpacity>
+        </div>
+      )}
+    </Draggable>
+  );
 });
