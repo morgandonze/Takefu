@@ -122,7 +122,7 @@ export default class CardStore {
   }
 
   getCardByPosition(level: number, group: number, order: number): Card | null {
-    if (!level || !order) return null;
+    if (level == null || order == null) return null;
     let parent;
     const card = this.cards.find((card: Card) => {
       parent = this.getCard(card.parentId);
@@ -214,26 +214,28 @@ export default class CardStore {
     if (!card || !card.parentId) return;
     const parent = this.getCard(card.parentId);
     if (!parent) return;
-    const siblings: Card[] = parent.childIds
+
+    const siblings: (Card | null)[] = parent.childIds
       .map((id) => this.getCard(id))
-      .filter((card) => card !== null) as Card[];
 
     const origOrder = card.order;
     let sibling;
-    if (origOrder <= order) {
-      for (var i = origOrder; i < order; i++) {
-        sibling = siblings[i];
-        sibling.order--;
+
+    console.log("reorder", order, origOrder)
+    if (order > origOrder) {
+      // moving card to later position
+      for (var i = origOrder + 1; i <= order; i++) {
+        sibling = siblings.find((s) => (s?.order == i))
+        if(sibling) sibling.order--;
       }
-    } else {
-      for (var i = order + 1; i <= origOrder; i++) {
-        sibling = siblings[origOrder + order - i];
-        sibling.order++;
+    } else if (order < origOrder || true) {
+      // moving card to earlier position
+      for (var i = origOrder - 1; i >= order; i--) {
+        sibling = siblings.find((s) => (s?.order == i))
+       if(sibling) sibling.order++;
       }
     }
-    console.log(card.order);
     card.order = order;
-    console.log(card.order);
   }
 
   // use to remove order gaps caused by deleting cards
