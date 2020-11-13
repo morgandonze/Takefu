@@ -69,7 +69,6 @@ function App() {
     if (sourceDrop == destDrop) {
       cardStore.changeCardOrder(card.id, dest.index);
     } else {
-      console.log(source, dest, levels);
       const newParentId: string | null = ((levels[
         parseInt(destLevel)
       ] as LevelType).groups[parseInt(destGroup)] as CardGroup).parentId;
@@ -79,9 +78,6 @@ function App() {
     }
   };
 
-  // iterate over levels
-  // in each level, iterate over groups
-  // in each group, iterate over cards
   return (
     <Provider cardStore={cardStore} uiStore={uiStore}>
       <DragDropContext onDragEnd={onDragEnd}>

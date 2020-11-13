@@ -234,7 +234,6 @@ export default class CardStore {
   }
 
   changeCardOrder(cardId: string, order: number) {
-
     const card = this.getCard(cardId);
     if (!card || !card.parentId) return;
     const parent = this.getCard(card.parentId);
@@ -264,11 +263,13 @@ export default class CardStore {
   }
 
   changeCardGroup(cardId: string, newParentId: string, order: number) {
-    if (!cardId) return;
+    if (cardId == null || !newParentId || order == null) return;
+
     const card = this.getCard(cardId);
     if (!card) return;
+
     const origParentId = card.parentId;
-    if (!origParentId || !newParentId) return;
+    if (origParentId == null) return;
 
     const origParent = this.getCard(card.parentId);
     const newParent = this.getCard(newParentId);
@@ -276,13 +277,14 @@ export default class CardStore {
 
     // card id is removed from parent's childIds
     const cardIndex = origParent?.childIds.findIndex((id) => id == cardId);
-    cardIndex && origParent?.childIds.splice(cardIndex, 1);
-    this.removeOrderGaps(origParentId);
+    if (cardIndex != null && origParent != null) {
+      cardIndex && origParent?.childIds.splice(cardIndex, 1);
+      this.removeOrderGaps(origParentId);
+    }
 
     // card id is added to new parent's childIds
-    // changes the cards parentId and order
-    // TODO do it right
     newParent?.childIds.push(cardId);
+
     card.parentId = newParentId;
     card.order = newParent.childIds.length;
     card.level = newParent.level + 1;
